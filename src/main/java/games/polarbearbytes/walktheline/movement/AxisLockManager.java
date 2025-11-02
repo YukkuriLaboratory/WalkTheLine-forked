@@ -181,6 +181,9 @@ public class AxisLockManager {
      * Nether: determine based on where we first teleport into the nether (probably need to tweak this for when changing portals)
      * End: hard coded as the locked axis should always be Z and on coordinate 0
      *
+     * If a primary axis is set for this save (by the first player who enabled the mod),
+     * this player will use the opposite axis.
+     *
      * @param player The server entity representing the player
      * @param worldKey The registry key for the world (dimension)
      * @return The locked axis and coordinate for that world
@@ -214,6 +217,13 @@ public class AxisLockManager {
                     axis = Axis.X;
                 }
 
+                // Check if a primary axis exists for this save
+                // If it does, use the opposite axis for this player
+                if (state.hasPrimaryAxis(saveName)) {
+                    Axis primaryAxis = state.getPrimaryAxis(saveName);
+                    axis = (primaryAxis == Axis.X) ? Axis.Z : Axis.X;
+                }
+
                 coordinate = pos.toCenterPos().getComponentAlongAxis(axis);
             }
             case "the_nether" -> {
@@ -228,6 +238,13 @@ public class AxisLockManager {
             default -> {
                 axis = Axis.Z;
                 coordinate = 0.5d;
+
+                // Check if a primary axis exists for this save
+                // If it does, use the opposite axis for this player
+                if (state.hasPrimaryAxis(saveName)) {
+                    Axis primaryAxis = state.getPrimaryAxis(saveName);
+                    axis = (primaryAxis == Axis.X) ? Axis.Z : Axis.X;
+                }
             }
         }
         LockedAxisData data = new LockedAxisData(axis, coordinate);
