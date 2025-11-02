@@ -44,3 +44,4 @@ replay_*.log
 walktheline.xcf
 logo.png
 logo-small.png
+.direnv
