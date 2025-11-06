@@ -16,7 +16,7 @@ jobs:
     outputs:
       has-write: ${{ steps.check.outputs.has-permission }}
     steps:
-      - uses: shiguredo/github-actions/.github/actions/check-write-permission@main
+      - uses: shiguredo/github-actions/.github/actions/check-write-permission@baef0140497adf913190fde714782f5d7c79f0a6
         id: check
         with:
           username: ${{ github.actor }}
@@ -37,13 +37,14 @@ jobs:
       actions: read # Required for Claude to read CI results on PRs
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@71cf2267d89c5cb81562390fa70a37fa40b1305e # v6-beta
         with:
           fetch-depth: 1
+          persist-credentials: true # zizmor: ignore[artipacked]
 
       - name: Run Claude Code
         id: claude
-        uses: anthropics/claude-code-action@v1
+        uses: anthropics/claude-code-action@8a1c4371755898f67cd97006ba7c97702d5fc4bf # v1.0.16
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
 
