@@ -3,6 +3,7 @@ package games.polarbearbytes.walktheline.state;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import games.polarbearbytes.walktheline.WalkTheLine;
+import games.polarbearbytes.walktheline.util.Utils;
 import net.minecraft.datafixer.DataFixTypes;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
@@ -108,6 +109,8 @@ public class PlayerState extends PersistentState {
         }
 
         syncToClient(player,key,data,enabled);
+
+        Utils.adjustmentPlayerPosition(player);
     }
 
     public boolean getEnabled(ServerPlayerEntity player){
