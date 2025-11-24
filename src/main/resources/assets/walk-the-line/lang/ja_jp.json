@@ -1,0 +1,12 @@
+{
+  "text.autoconfig.walk-the-line-client.title": "Walk the Lineの設定 (クライアント)",
+  "text.autoconfig.walk-the-line-client.option.rotatingColor": "ラインのゲーミング発色の有効化",
+  "text.autoconfig.walk-the-line-client.option.rotatingColorAlpha": "ラインのゲーミング発色時の透明度",
+  "text.autoconfig.walk-the-line-client.option.singleColor": "単色ラインの色",
+  "text.autoconfig.walk-the-line-client.option.lineWidth": "ラインの太さ (左右)",
+
+  "text.autoconfig.walk-the-line-client.option.rotatingColor.@Tooltip": "ラインの色が自動で虹色に変化する発色モードを有効にします",
+  "text.autoconfig.walk-the-line-client.option.rotatingColorAlpha.@Tooltip": "発色モードの透明度 (%指定)",
+  "text.autoconfig.walk-the-line-client.option.lineWidth.@Tooltip": "プレイヤーの左右に表示されるラインの太さ",
+  "text.autoconfig.walk-the-line-client.option.singleColor.@Tooltip": "単色ラインに使用するRGBAの16進数コード"
+}
