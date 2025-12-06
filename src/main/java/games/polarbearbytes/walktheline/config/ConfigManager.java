@@ -42,7 +42,10 @@ public class ConfigManager {
     }
 
     public static WalkTheLineConfig getConfig() {
-        loadConfig();
+        if(config == null) {
+            loadConfig();
+            WalkTheLine.LOGGER.info("Config loaded!");
+        }
         return config;
     }
 }
