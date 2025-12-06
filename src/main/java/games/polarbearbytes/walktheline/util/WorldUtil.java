@@ -4,6 +4,6 @@ import net.minecraft.world.World;
 
 public class WorldUtil {
     public static boolean isTheEnd(World world) {
-        return world.getRegistryKey() == World.END;
+        return "the_end".equals(world.getRegistryKey().getValue().getPath());
     }
 }

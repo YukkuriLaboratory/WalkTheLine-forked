@@ -29,6 +29,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.util.EnumSet;
+import java.util.Set;
 
 /**
  * Class for managing what axis and coordinate we are locked on per world (dimension)
@@ -52,7 +53,24 @@ public class AxisLockManager {
             if(!PlayerState.get().getEnabled(player)) return;
             WorldsData worldsData = PlayerState.get().getWorldsData(player);
             LockedAxisData lockedAxisData = PlayerState.get().getLockedAxisData(player);
-            syncToClient(player,to.getRegistryKey(),lockedAxisData,!WorldUtil.isTheEnd(to) && worldsData.enabled());
+            boolean isInEnd = WorldUtil.isTheEnd(to);
+            if(isInEnd) {
+                WalkTheLine.LOGGER.info("Is in the end!");
+                WalkTheLine.server.getPlayerManager().getPlayerList().forEach(p -> {
+                    if(WorldUtil.isTheEnd(p.getEntityWorld())) return; // ignore player who is in the end
+                    p.teleport(
+                            player.getEntityWorld(),
+                            player.getX(),
+                            player.getY(),
+                            player.getZ(),
+                            Set.of(),
+                            player.getYaw(),
+                            player.getPitch(),
+                            true
+                    );
+                });
+            }
+            syncToClient(player,to.getRegistryKey(),lockedAxisData,!isInEnd && worldsData.enabled());
         });
 
         /*
