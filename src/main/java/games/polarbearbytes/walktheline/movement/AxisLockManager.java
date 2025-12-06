@@ -1,6 +1,7 @@
 package games.polarbearbytes.walktheline.movement;
 
 import com.mojang.datafixers.util.Pair;
+import games.polarbearbytes.walktheline.WalkTheLine;
 import games.polarbearbytes.walktheline.config.ConfigManager;
 import games.polarbearbytes.walktheline.config.WalkTheLineConfig;
 import games.polarbearbytes.walktheline.network.SyncPacket;
@@ -8,6 +9,7 @@ import games.polarbearbytes.walktheline.state.LockedAxisData;
 import games.polarbearbytes.walktheline.state.PlayerState;
 import games.polarbearbytes.walktheline.state.WorldsData;
 import games.polarbearbytes.walktheline.util.Utils;
+import games.polarbearbytes.walktheline.util.WorldUtil;
 import games.polarbearbytes.walktheline.world.StrongholdLocator;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
@@ -50,7 +52,7 @@ public class AxisLockManager {
             if(!PlayerState.get().getEnabled(player)) return;
             WorldsData worldsData = PlayerState.get().getWorldsData(player);
             LockedAxisData lockedAxisData = PlayerState.get().getLockedAxisData(player);
-            syncToClient(player,to.getRegistryKey(),lockedAxisData,worldsData.enabled());
+            syncToClient(player,to.getRegistryKey(),lockedAxisData,!WorldUtil.isTheEnd(to) && worldsData.enabled());
         });
 
         /*
@@ -75,6 +77,7 @@ public class AxisLockManager {
      * @param data The locked axis and coordinate data
      */
     public static boolean checkDistanceFromLockedAxis(ServerPlayerEntity player, LockedAxisData data){
+        if(WorldUtil.isTheEnd(player.getEntityWorld())) return true;
         double coordinate = Utils.getPlayerCoordAlongLockedAxis(player, data.axis());
         double distance = coordinate - data.coordinate();
         Entity entity;
@@ -195,6 +198,7 @@ public class AxisLockManager {
         Axis axis;
         double coordinate;
 
+        WalkTheLine.LOGGER.debug("Determining dimension lock for {} in {}", player.getName().getLiteralString(), worldKey.getValue().getPath());
         switch (worldKey.getValue().getPath()) {
             case "overworld" -> {
                 //Get the overworld's spawn location
