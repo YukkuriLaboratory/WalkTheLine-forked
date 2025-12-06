@@ -183,7 +183,7 @@ public class AxisLockManager {
      * Overworld: locate stronghold and make sure the locked coordinate passes through the center of the portal frame
      * Nether: determine based on where we first teleport into the nether (probably need to tweak this for when changing portals)
      * End: hard coded as the locked axis should always be Z and on coordinate 0
-     *
+     * <p>
      * If a primary axis is set for this save (by the first player who enabled the mod),
      * this player will use the opposite axis.
      *
