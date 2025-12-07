@@ -9,16 +9,15 @@ import games.polarbearbytes.walktheline.network.SyncPacket;
 import games.polarbearbytes.walktheline.state.LockedAxisData;
 import games.polarbearbytes.walktheline.state.PlayerState;
 import games.polarbearbytes.walktheline.state.WorldsData;
+import games.polarbearbytes.walktheline.util.PosUtil;
 import games.polarbearbytes.walktheline.util.Utils;
 import games.polarbearbytes.walktheline.util.WorldUtil;
 import games.polarbearbytes.walktheline.world.StrongholdLocator;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -122,12 +121,12 @@ public class AxisLockManager {
             switch(data.axis()){
                 case X -> {
                     Vec3d newPos = new Vec3d(data.coordinate(), pos.getY(), pos.getZ());
-                    double y = findSafeYAbove(player, newPos);
+                    double y = PosUtil.findSafeYAbove(player, newPos);
                     entity.teleport(world, newPos.getX(), y, newPos.getZ() ,EnumSet.noneOf(PositionFlag.class),player.getYaw(),player.getPitch(),false);
                 }
                 case Z -> {
                     Vec3d newPos = new Vec3d(pos.getX(), pos.getY(), data.coordinate());
-                    double y = findSafeYAbove(player, newPos);
+                    double y = PosUtil.findSafeYAbove(player, newPos);
                     entity.teleport(world, newPos.getX(), y, newPos.getZ(),EnumSet.noneOf(PositionFlag.class),player.getYaw(),player.getPitch(),false);
                 }
             }
@@ -160,41 +159,6 @@ public class AxisLockManager {
 
         player.setVelocity(newVelocity);
         player.velocityModified = true;
-    }
-
-    /**
-     * When teleporting player find a safe space to teleport player
-     * Block beneath player needs to not be air, block at foot and head level need to be air
-     *
-     * @param player The server entity representing the player
-     * @param position The position we want to teleport to
-     * @return The Y coordinate that we have determined to be safe
-     */
-    private static double findSafeYAbove(ServerPlayerEntity player, Vec3d position) {
-        ServerWorld world = player.getEntityWorld();
-        BlockPos.Mutable mutablePosition = new BlockPos.Mutable((int) Math.floor(position.getX()), world.getHeight(), (int) Math.floor(position.getZ()));
-        int bottom = world.getBottomY();
-        boolean isHeadAir = world.getBlockState(mutablePosition).isAir();
-        boolean isFootAir = world.getBlockState(mutablePosition.move(Direction.DOWN)).isAir();
-        boolean isBelowAir;
-        boolean isBelowBedrock;
-
-        //scan from sky downwards
-        while(mutablePosition.getY() >= bottom) {
-            BlockState state = world.getBlockState(mutablePosition.move(Direction.DOWN));
-            isBelowAir = state.isAir();
-
-            String name = Registries.BLOCK.getId(state.getBlock()).toString();
-            isBelowBedrock = name.equals("minecraft:bedrock");
-
-            if (!isBelowAir && isFootAir && isHeadAir && !isBelowBedrock) {
-                return mutablePosition.getY() + 1;
-            }
-            isHeadAir = isFootAir;
-            isFootAir = isBelowAir;
-        }
-        // Fallback to original position
-        return position.getY();
     }
 
     /**
