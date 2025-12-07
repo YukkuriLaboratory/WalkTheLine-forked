@@ -4,6 +4,7 @@ import com.mojang.datafixers.util.Pair;
 import games.polarbearbytes.walktheline.WalkTheLine;
 import games.polarbearbytes.walktheline.config.ConfigManager;
 import games.polarbearbytes.walktheline.config.WalkTheLineConfig;
+import games.polarbearbytes.walktheline.network.OtherPlayerSyncPacket;
 import games.polarbearbytes.walktheline.network.SyncPacket;
 import games.polarbearbytes.walktheline.state.LockedAxisData;
 import games.polarbearbytes.walktheline.state.PlayerState;
@@ -278,7 +279,15 @@ public class AxisLockManager {
      */
     public static void syncToClient(ServerPlayerEntity player, RegistryKey<World> worldKey, LockedAxisData data, Boolean enabled) {
         WalkTheLineConfig cfg = ConfigManager.getConfig();
+
+        // For main player
         SyncPacket packet = new SyncPacket(worldKey,data, cfg.coordinateTolerance, enabled);
         ServerPlayNetworking.send(player, packet);
+
+        // For other player
+        OtherPlayerSyncPacket otherPlayerSyncPacket = new OtherPlayerSyncPacket(worldKey, data, enabled);
+        WalkTheLine.server.getPlayerManager().getPlayerList().forEach(p -> {
+            ServerPlayNetworking.send(p, otherPlayerSyncPacket);
+        });
     }
 }
