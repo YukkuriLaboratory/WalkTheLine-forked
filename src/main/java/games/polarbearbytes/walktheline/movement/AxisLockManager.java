@@ -55,7 +55,7 @@ public class AxisLockManager {
             LockedAxisData lockedAxisData = PlayerState.get().getLockedAxisData(player);
             boolean isInEnd = WorldUtil.isTheEnd(to);
             if(isInEnd) {
-                WalkTheLine.LOGGER.info("Is in the end!");
+                WalkTheLine.LOGGER.debug("Now, player is in the end!");
                 WalkTheLine.server.getPlayerManager().getPlayerList().forEach(p -> {
                     if(WorldUtil.isTheEnd(p.getEntityWorld())) return; // ignore player who is in the end
                     p.teleport(
