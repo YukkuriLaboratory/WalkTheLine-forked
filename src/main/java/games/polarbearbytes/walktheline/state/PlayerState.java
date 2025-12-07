@@ -87,7 +87,10 @@ public class PlayerState extends PersistentState {
      * @param player Server entity representing the player
      * @param enabled Flag for wither or not the mod is enabled
      */
-    public void setEnabled(ServerPlayerEntity player, Boolean enabled){
+    public void setEnabled(ServerPlayerEntity player, Boolean enabled) {
+        setEnabled(player, enabled, true);
+    }
+    public void setEnabled(ServerPlayerEntity player, Boolean enabled, boolean applyAdjustment){
         MinecraftServer server = player.getEntityWorld().getServer();
         String saveName = server.getSaveProperties().getLevelName();
         getPlayerSaves(player).savesData().compute(saveName,
@@ -114,7 +117,9 @@ public class PlayerState extends PersistentState {
 
         syncToClient(player,key,data,enabled);
 
-        Utils.adjustmentPlayerPosition(player);
+        if(applyAdjustment) {
+            Utils.adjustmentPlayerPosition(player);
+        }
     }
 
     public boolean getEnabled(ServerPlayerEntity player){

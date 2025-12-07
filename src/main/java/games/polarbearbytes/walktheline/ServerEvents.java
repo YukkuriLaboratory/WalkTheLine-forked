@@ -4,12 +4,13 @@ import games.polarbearbytes.walktheline.movement.AxisLockManager;
 import games.polarbearbytes.walktheline.network.OtherPlayerSyncPacket;
 import games.polarbearbytes.walktheline.network.SyncPacket;
 import games.polarbearbytes.walktheline.state.PlayerState;
+import games.polarbearbytes.walktheline.util.PosUtil;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -38,35 +39,46 @@ public class ServerEvents {
                         literal("walktheline")
                                 .then(literal("enable")
                                         .executes(ctx -> {
+                                            WalkTheLine.LOGGER.info("Processing enable command...");
                                             var player = ctx.getSource().getPlayer();
-                                            if (player == null) return 0;
+                                            if (player == null) {
+                                                WalkTheLine.LOGGER.warn("Command source player is null!");
+                                                return 0;
+                                            }
                                             var server = ctx.getSource().getServer();
                                             var playerState = PlayerState.get();
-                                            playerState.setEnabled(player, true);
-                                            var data = playerState.getLockedAxisData(player);
+                                            playerState.setEnabled(player, true, false);
+                                            var data = playerState.getLockedAxisData(player); // might be null
                                             server.getPlayerManager()
                                                     .getPlayerList()
                                                     .stream()
                                                     .filter((p) -> p != player && !PlayerState.get().getEnabled(p))
                                                     .forEach((otherPlayer) -> {
-                                                        PlayerState.get().setEnabled(otherPlayer, true);
-                                                        var pos = otherPlayer.getEntityPos();
-                                                        if (data.axis() == Direction.Axis.X) {
-                                                            otherPlayer.setPos(player.getX(), pos.getY(), pos.getZ());
-                                                        } else {
-                                                            otherPlayer.setPos(pos.getX(), pos.getY(), player.getZ());
-                                                        }
+                                                        PlayerState.get().setEnabled(otherPlayer, true, false);
                                                     });
-                                            server.getPlayerManager().getPlayerList().stream().filter((p) -> p != player)
-                                                    .findAny()
-                                                    .ifPresent((otherPlayer) -> {
-                                                        var pos = player.getEntityPos();
-                                                        if (data.axis() == Direction.Axis.X) {
-                                                            player.setPos(pos.getX(), pos.getY(), otherPlayer.getZ());
-                                                        } else {
-                                                            player.setPos(otherPlayer.getX(), pos.getY(), pos.getZ());
-                                                        }
-                                                    });
+
+                                            // get other player's data
+                                            var optionalOtherPlayer = server.getPlayerManager().getPlayerList().stream().filter(p -> p!=player).findFirst();
+                                            if(optionalOtherPlayer.isEmpty()) {
+                                                WalkTheLine.LOGGER.warn("Other player wasn't found!");
+                                                return 0;
+                                            }
+                                            var otherData = PlayerState.get().getLockedAxisData(optionalOtherPlayer.get());
+
+                                            // get safe y of cross point
+                                            var crossX = data.coordinate();
+                                            var crossZ = otherData.coordinate();
+                                            var crossVec = new Vec3d(crossX, 65, crossZ);
+                                            var crossY = PosUtil.findSafeYAbove(player, crossVec);
+
+                                            // teleport all players to cross point
+                                            var tpVec = new Vec3d(crossX, crossY, crossZ);
+                                            WalkTheLine.LOGGER.info("Teleport all players to {}", tpVec);
+                                            server.getPlayerManager().getPlayerList().forEach(p -> {
+                                                p.refreshPositionAfterTeleport(tpVec);
+                                            });
+
+                                            // feedback
                                             ctx.getSource().sendFeedback(() -> Text.literal("Walk the Line enabled."), false);
                                             return 1;
                                         })

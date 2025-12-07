@@ -8,7 +8,6 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.entry.RegistryEntryList;
-import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StrongholdGenerator;
 import net.minecraft.structure.StructurePiece;
@@ -18,7 +17,8 @@ import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.gen.structure.Structure;
 import net.minecraft.world.gen.structure.StructureType;
 import org.jetbrains.annotations.Nullable;
@@ -71,7 +71,7 @@ public class StrongholdLocator {
             WalkTheLine.LOGGER.error("No Stronghold Structures Found");
             return null;
         } else {
-            WorldChunk chunk = getWorldChunk(pair, serverWorld);
+            Chunk chunk = getWorldChunk(pair, serverWorld);
 
             if(chunk == null){
                 return null;
@@ -117,19 +117,9 @@ public class StrongholdLocator {
         return null;
     }
 
-    private static @Nullable WorldChunk getWorldChunk(Pair<BlockPos, RegistryEntry<Structure>> pair, ServerWorld serverWorld) {
+    private static @Nullable Chunk getWorldChunk(Pair<BlockPos, RegistryEntry<Structure>> pair, ServerWorld serverWorld) {
         BlockPos pos = pair.getFirst();
-
-            /*
-            Get the WorldChunk of the starting piece of the stronghold.
-            Loop through all StructureStart(s) in the chunk, check for one
-            that contains a StructureType.Stronghold and get its children;
-             */
         ChunkPos chunkPos = new ChunkPos(pos);
-        ServerChunkManager chunkManager = serverWorld.getChunkManager();
-
-        //We need to force load the chunk so that the whole stronghold generates
-        chunkManager.setChunkForced(chunkPos,true);
-        return chunkManager.getWorldChunk(chunkPos.x, chunkPos.z);
+        return serverWorld.getChunk(chunkPos.x, chunkPos.z, ChunkStatus.FULL);
     }
 }
