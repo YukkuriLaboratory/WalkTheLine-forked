@@ -227,26 +227,19 @@ public class AxisLockManager {
                 if(locationPair == null || locationPair.getFirst() == null) return null;
                 BlockPos pos = locationPair.getFirst();
 
-
-                axis = locationPair.getSecond().getAxis();
-                /*
-                Flip the axis so that we will be along the path that goes through
-                the silverfish spawner and portalframe
-                 */
-                if (axis == Axis.X) {
-                    axis = Axis.Z;
-                } else {
-                    axis = Axis.X;
-                }
-
                 // Check if a primary axis exists for this save
                 // If it does, use the opposite axis for this player
                 if (state.hasPrimaryAxis(saveName)) {
                     Axis primaryAxis = state.getPrimaryAxis(saveName);
                     axis = (primaryAxis == Axis.X) ? Axis.Z : Axis.X;
+                    coordinate = pos.toCenterPos().getComponentAlongAxis(axis) + player.getRandom().nextBetween(-400, 400);
+                } else {
+                    axis = Axis.X;
+                    coordinate = pos.toCenterPos().getComponentAlongAxis(axis);
+                    state.setPrimaryAxis(saveName, axis);
                 }
 
-                coordinate = pos.toCenterPos().getComponentAlongAxis(axis);
+                WalkTheLine.LOGGER.info("Update {}'s axis: {} / coord: {} (now primary: {})", player.getStringifiedName(), axis.asString(), coordinate, PlayerState.get().getPrimaryAxis(saveName));
             }
             case "the_nether" -> {
                 ServerWorld nether = player.getEntityWorld().getServer().getWorld(World.NETHER);

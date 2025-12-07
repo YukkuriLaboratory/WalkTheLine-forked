@@ -9,16 +9,17 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Uuids;
+import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateType;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import net.minecraft.util.math.Direction.Axis;
 
 import static games.polarbearbytes.walktheline.movement.AxisLockManager.determineDimensionLocks;
 import static games.polarbearbytes.walktheline.movement.AxisLockManager.syncToClient;
@@ -106,6 +107,9 @@ public class PlayerState extends PersistentState {
         // If enabling the mod and no primary axis is set yet, set this player's axis as primary
         if(enabled && !hasPrimaryAxis(saveName)){
             setPrimaryAxis(saveName, data.axis());
+            WalkTheLine.LOGGER.debug("Set primary axis as {} by PlayerState.setEnabled", data.axis().asString());
+        } else {
+            WalkTheLine.LOGGER.debug("Primary axis set skipped. (enabled: {}, hasPrimaryAxis: {})", enabled, hasPrimaryAxis(saveName));
         }
 
         syncToClient(player,key,data,enabled);
@@ -131,6 +135,7 @@ public class PlayerState extends PersistentState {
      * @param saveName The name of the save
      * @return The primary axis, or null if not set
      */
+    @Nullable
     public Axis getPrimaryAxis(String saveName) {
         return primaryAxisBySave.get(saveName);
     }
