@@ -5,7 +5,11 @@ import games.polarbearbytes.walktheline.config.WalkTheLineClientConfig;
 import lombok.Getter;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.BufferBuilderStorage;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.DefaultFramebufferSet;
+import net.minecraft.client.render.FrameGraphBuilder;
+import net.minecraft.client.render.Frustum;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -24,6 +28,7 @@ public class LineRenderer implements IRenderer {
 
     private LineRenderer(){
         this.lineRenderers.add(RainbowLine.INSTANCE);
+        this.lineRenderers.add(OtherPlayerRainbowLine.INSTANCE);
     }
 
     public void render(Framebuffer framebuffer, Matrix4f positionMatrix, Matrix4f projectionMatrix, MinecraftClient client, FrameGraphBuilder frameGraphBuilder, DefaultFramebufferSet fbSet, Frustum frustum, Camera camera, BufferBuilderStorage buffers, Profiler profiler){

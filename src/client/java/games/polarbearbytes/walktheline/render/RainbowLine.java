@@ -28,7 +28,7 @@ import java.time.LocalTime;
 public class RainbowLine extends LineBase {
     public final static RainbowLine INSTANCE = new RainbowLine();
 
-    private RainbowLine(){
+    protected RainbowLine(){
         this.lineThickness = 8;
     }
 
