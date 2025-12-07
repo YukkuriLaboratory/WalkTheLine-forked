@@ -250,7 +250,8 @@ public class AxisLockManager {
 
         // For other player
         OtherPlayerSyncPacket otherPlayerSyncPacket = new OtherPlayerSyncPacket(worldKey, data, enabled);
-        WalkTheLine.server.getPlayerManager().getPlayerList().forEach(p -> {
+        player.getEntityWorld().getServer().getPlayerManager().getPlayerList().forEach(p -> {
+            if(p == player) return;
             ServerPlayNetworking.send(p, otherPlayerSyncPacket);
         });
     }
