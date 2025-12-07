@@ -40,13 +40,14 @@ public class RainbowLine extends LineBase {
     @Override
     public void render(Vec3d cameraPos, Entity entity, MinecraftClient client) {
         if(client.world == null) return;
+        renderRainbowLine(cameraPos, entity, WalkTheLineClientConfig.getLockedAxisData(client.world), client.options.getViewDistance().getValue());
+    }
 
-        LockedAxisData axisData = WalkTheLineClientConfig.getLockedAxisData(client.world);
+    public void renderRainbowLine(Vec3d cameraPos, Entity entity, LockedAxisData axisData, int viewDistance) {
         if(lastEntityPosition == null || axisData == null) return;
         double tolerance = WalkTheLineClientConfig.tolerance;
 
         BufferBuilder lineBuilder = this.renderContext.init();
-        Integer distance = client.options.getViewDistance().getValue();
 
         WalkTheLineClientConfig config = WalkTheLineClientConfig.getConfig();
         float lineWidth = config.lineWidth / 100f;
@@ -57,8 +58,8 @@ public class RainbowLine extends LineBase {
         //This is the left to right directions that we are clamped on
         Direction[] perpendicularDirections = axisData.axis().getDirections();
 
-        Vec3d lineStart = entity.getEntityPos().offset(directions[0], 16*distance);
-        Vec3d lineEnd = entity.getEntityPos().offset(directions[1], 16*distance);
+        Vec3d lineStart = entity.getEntityPos().offset(directions[0], 16* viewDistance);
+        Vec3d lineEnd = entity.getEntityPos().offset(directions[1], 16* viewDistance);
 
         if(axisData.axis() == Axis.Z){
             lineStart = new Vec3d(lineStart.getX(), lineStart.getY(), axisData.coordinate());
