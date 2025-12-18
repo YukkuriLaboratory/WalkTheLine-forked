@@ -31,6 +31,7 @@ public class Utils {
     public static void adjustmentPlayerPosition(ServerPlayerEntity player) {
         LockedAxisData data = PlayerState.get().getLockedAxisData(player);
         if (data == null) return;
+
         boolean result = AxisLockManager.checkDistanceFromLockedAxis(player, data);
         //result will be false if it had to move us.
         if (!result) return;
@@ -42,28 +43,33 @@ public class Utils {
         double xv = player.getVelocity().x;
         double zv = player.getVelocity().z;
 
-        if (data.axis() == Direction.Axis.X) {
-            if (x > data.coordinate() + cfg.coordinateTolerance) {
-                x = data.coordinate() + cfg.coordinateTolerance;
-                xv = 0;
-            }
-            if (x < data.coordinate() - cfg.coordinateTolerance) {
-                x = data.coordinate() - cfg.coordinateTolerance;
-                xv = 0;
-            }
+        double coord = data.coordinate();
+        double coordRange = cfg.coordinateTolerance;
 
-        } else {
-            if (z > data.coordinate() + cfg.coordinateTolerance) {
-                z = data.coordinate() + cfg.coordinateTolerance;
-                zv = 0;
+        if (data.axis() == Direction.Axis.X) {
+            double clampedX = clampInRange(x, coord, coordRange);
+
+            // if it's clamped
+            if(x != clampedX) {
+                x = clampedX;
+                xv = 0;
             }
-            if (z < data.coordinate() - cfg.coordinateTolerance) {
-                z = data.coordinate() - cfg.coordinateTolerance;
+        } else {
+            double clampedZ = clampInRange(z, coord, coordRange);
+
+            // if it's clamped
+            if(z != clampedZ) {
+                z = clampedZ;
                 zv = 0;
             }
         }
 
+        // set new normalized position and velocity
         player.setPosition(x, player.getY(), z);
         player.setVelocity(xv, player.getVelocity().y, zv);
+    }
+
+    private static double clampInRange(double value, double base, double range) {
+        return Math.clamp(value, base - range, base + range);
     }
 }
