@@ -45,6 +45,7 @@ public class WalkTheLineClient implements ClientModInitializer {
 
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
 			WalkTheLineClientConfig.reset();
+            otherPlayerAxisData.clear();
 		});
 	}
 }
