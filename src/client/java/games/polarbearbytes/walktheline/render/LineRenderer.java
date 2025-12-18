@@ -2,7 +2,6 @@ package games.polarbearbytes.walktheline.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import games.polarbearbytes.walktheline.config.WalkTheLineClientConfig;
-import lombok.Getter;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.render.BufferBuilderStorage;
@@ -23,8 +22,11 @@ import java.util.List;
 public class LineRenderer implements IRenderer {
     private final List<LineBase> lineRenderers = new ArrayList<>();
 
-    @Getter
     public static final LineRenderer INSTANCE = new LineRenderer();
+
+    public static LineRenderer getInstance() {
+        return INSTANCE;
+    }
 
     private LineRenderer(){
         this.lineRenderers.add(RainbowLine.INSTANCE);

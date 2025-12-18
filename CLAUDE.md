@@ -19,7 +19,6 @@ Walk The Line is a Fabric Minecraft mod that restricts player movement to a sing
   - Fabric API: 0.133.14+1.21.9
   - Cloth Config: 20.0.148 (for config GUI)
   - ModMenu: 16.0.0-rc.1 (for mod integration)
-  - Lombok: 1.18.38
   - JOML: 1.10.8 (math library)
   - Fabric Permissions API: 0.5.0
 
