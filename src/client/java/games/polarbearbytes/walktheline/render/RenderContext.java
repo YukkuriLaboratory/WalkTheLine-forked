@@ -13,7 +13,6 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
 import com.mojang.blaze3d.vertex.VertexFormat.IndexType;
 import games.polarbearbytes.walktheline.WalkTheLine;
-import lombok.Getter;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gl.ScissorState;
@@ -24,6 +23,7 @@ import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
@@ -51,10 +51,17 @@ public class RenderContext {
 
     public float lineWidth;
 
-    @Getter
     protected boolean started;
-    @Getter
+
+    public boolean isStarted() {
+        return started;
+    }
+
     protected boolean uploaded;
+
+    public boolean isUploaded() {
+        return uploaded;
+    }
 
     public RenderContext(Supplier<String> id, RenderPipeline renderPipeline){
         this.id = id;

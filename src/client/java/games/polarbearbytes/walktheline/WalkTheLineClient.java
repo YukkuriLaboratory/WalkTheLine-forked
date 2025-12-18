@@ -27,7 +27,7 @@ public class WalkTheLineClient implements ClientModInitializer {
 		}
 		WalkTheLineClientConfig.register();
 
-		RendererHandler.getInstance().register(LineRenderer.getINSTANCE());
+		RendererHandler.getInstance().register(LineRenderer.getInstance());
 
 		/*
 			Register the packet that we use to tell the client the locked Axis, Coordinate per World (dimension)
