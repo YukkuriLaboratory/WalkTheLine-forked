@@ -75,7 +75,7 @@ public class ServerEvents {
                                             var tpVec = new Vec3d(crossX, crossY, crossZ);
                                             WalkTheLine.LOGGER.info("Teleport all players to {}", tpVec);
                                             server.getPlayerManager().getPlayerList().forEach(p -> {
-                                                p.refreshPositionAfterTeleport(tpVec);
+                                                p.teleport(crossX, crossY, crossZ, true);
                                             });
 
                                             // feedback
