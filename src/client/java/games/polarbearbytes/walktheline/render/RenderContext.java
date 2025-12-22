@@ -8,6 +8,7 @@ import com.mojang.blaze3d.systems.GpuDevice;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.systems.RenderSystem.ShapeIndexBuffer;
+import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat.DrawMode;
@@ -15,9 +16,11 @@ import com.mojang.blaze3d.vertex.VertexFormat.IndexType;
 import games.polarbearbytes.walktheline.WalkTheLine;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
+import net.minecraft.client.gl.GpuSampler;
 import net.minecraft.client.gl.ScissorState;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BuiltBuffer;
+import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.util.BufferAllocator;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
@@ -129,7 +132,7 @@ public class RenderContext {
         uploaded = true;
     }
 
-    protected void draw(Framebuffer framebuffer, MinecraftClient client, GpuTextureView glTextureView){
+    protected void draw(Framebuffer framebuffer, MinecraftClient client, GpuTextureView glTextureView, GpuSampler sampler){
         if(!RenderSystem.isOnRenderThread()) return;
         GpuDevice device = RenderSystem.getDevice();
         if(device == null){
@@ -159,13 +162,13 @@ public class RenderContext {
                         RenderSystem.getModelViewMatrix(),
                         colorMod,
                         modelOffset,
-                        new Matrix4f(normalMatrix),
-                        0f);
+                        new Matrix4f(normalMatrix));
         try(RenderPass pass = device.createCommandEncoder().createRenderPass(this.id,
                 texture1, OptionalInt.empty(),
                 texture2, OptionalDouble.empty())) {
             pass.setPipeline(this.renderPipeline);
-            pass.bindSampler("Lightmap", MinecraftClient.getInstance().gameRenderer.getLightmapTextureManager().getGlTextureView());
+            LightmapTextureManager textureManager = MinecraftClient.getInstance().gameRenderer.getLightmapTextureManager();
+            pass.bindTexture("LineSampler", textureManager.getGlTextureView(), RenderSystem.getSamplerCache().get(FilterMode.LINEAR));
 
             ScissorState scissorState = RenderSystem.getScissorStateForRenderTypeDraws();
 
@@ -182,11 +185,10 @@ public class RenderContext {
             }
             pass.setVertexBuffer(0, vertexBuffer);
             if (glTextureView != null){
-                pass.bindSampler("Sampler0", glTextureView);
+                pass.bindTexture("Sampler0", glTextureView, sampler);
             }
 
             pass.drawIndexed(0, 0, this.indexCount, 1);
-            RenderSystem.lineWidth(RenderSystem.getShaderLineWidth());
         }
     }
 

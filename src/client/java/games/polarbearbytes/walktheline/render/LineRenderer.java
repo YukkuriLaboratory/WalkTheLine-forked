@@ -36,8 +36,8 @@ public class LineRenderer implements IRenderer {
     public void render(Framebuffer framebuffer, Matrix4f positionMatrix, Matrix4f projectionMatrix, MinecraftClient client, FrameGraphBuilder frameGraphBuilder, DefaultFramebufferSet fbSet, Frustum frustum, Camera camera, BufferBuilderStorage buffers, Profiler profiler){
         if(!WalkTheLineClientConfig.modEnabled) return;
         Entity cameraEntity = client.getCameraEntity();
-        this.update(camera.getPos(), cameraEntity, client);
-        this.draw(camera.getPos());
+        this.update(camera.getCameraPos(), cameraEntity, client);
+        this.draw(camera.getCameraPos());
     }
 
     public void update(Vec3d cameraPos, Entity entity, MinecraftClient client){

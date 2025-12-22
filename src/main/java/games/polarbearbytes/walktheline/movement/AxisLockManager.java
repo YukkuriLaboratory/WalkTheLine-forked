@@ -158,7 +158,7 @@ public class AxisLockManager {
         };
 
         player.setVelocity(newVelocity);
-        player.velocityModified = true;
+        player.knockedBack = true;
     }
 
     /**

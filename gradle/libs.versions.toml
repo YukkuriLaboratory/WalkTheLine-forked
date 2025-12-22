@@ -1,17 +1,17 @@
 [versions]
-minecraft = "1.21.9"
-yarn = "1.21.9+build.1"
-fabricApi = "0.133.14+1.21.9"
-fabricLoader = "0.17.2"
-fabricLoom = "1.11-SNAPSHOT"
+minecraft = "1.21.11"
+yarn = "1.21.11+build.1"
+fabricApi = "0.139.4+1.21.11"
+fabricLoader = "0.18.1"
+fabricLoom = "1.14-SNAPSHOT"
 
 # === User Dependencies ===
 gson = "2.13.2"
 joml = "1.10.8"
-clothConfig = "20.0.148"
-fabricPermissionsApi = "0.5.0"
-iris = "1.9.3+1.21.9-fabric"
-modmenu = "16.0.0-rc.1"
+clothConfig = "21.11.150"
+fabricPermissionsApi = "0.6.1"
+iris = "1.10.2+1.21.11-fabric"
+modmenu = "17.0.0-alpha.1"
 
 [libraries]
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }

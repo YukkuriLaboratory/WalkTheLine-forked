@@ -42,7 +42,7 @@ public abstract class LineBase implements ILine {
     public void draw(Vec3d cameraPos) {
         if(!renderContext.isStarted() || !renderContext.isUploaded()) return;
         renderContext.lineWidth = 5;
-        renderContext.draw(null, MinecraftClient.getInstance(), null);
+        renderContext.draw(null, MinecraftClient.getInstance(), null, null);
     }
 
     @Override
