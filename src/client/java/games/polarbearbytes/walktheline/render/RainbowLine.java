@@ -1,6 +1,7 @@
 package games.polarbearbytes.walktheline.render;
 
 import games.polarbearbytes.walktheline.WalkTheLine;
+import games.polarbearbytes.walktheline.WalkTheLineClient;
 import games.polarbearbytes.walktheline.config.WalkTheLineClientConfig;
 import games.polarbearbytes.walktheline.state.LockedAxisData;
 import games.polarbearbytes.walktheline.util.Utils;
@@ -40,7 +41,12 @@ public class RainbowLine extends LineBase {
     @Override
     public void render(Vec3d cameraPos, Entity entity, MinecraftClient client) {
         if(client.world == null) return;
-        renderRainbowLine(cameraPos, entity, WalkTheLineClientConfig.getLockedAxisData(client.world), client.options.getViewDistance().getValue());
+        var lineMap = WalkTheLineClient.lockedAxisDataCache.get(client.world.getRegistryKey());
+        if(lineMap == null) return;
+        var viewDistance = client.options.getViewDistance().getValue();
+        lineMap.forEach((k,v) -> {
+            renderRainbowLine(cameraPos, entity, v, viewDistance);
+        });
     }
 
     public void renderRainbowLine(Vec3d cameraPos, Entity entity, LockedAxisData axisData, int viewDistance) {

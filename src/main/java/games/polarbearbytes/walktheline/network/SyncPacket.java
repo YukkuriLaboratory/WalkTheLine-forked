@@ -9,7 +9,10 @@ import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Uuids;
 import net.minecraft.world.World;
+
+import java.util.UUID;
 
 import static games.polarbearbytes.walktheline.WalkTheLine.MOD_ID;
 
@@ -20,13 +23,14 @@ import static games.polarbearbytes.walktheline.WalkTheLine.MOD_ID;
  * @param data The locked axis, coordinate data
  * @param enabled Is the mod enabled
  */
-public record SyncPacket(RegistryKey<World> worldKey, LockedAxisData data, Double coordTolerance, Boolean enabled)
+public record SyncPacket(UUID playerUuid, RegistryKey<World> worldKey, LockedAxisData data, Double coordTolerance, Boolean enabled)
         implements CustomPayload {
     public static final Identifier ID = Identifier.of(MOD_ID, "sync_locked_axis");
     public static final CustomPayload.Id<SyncPacket> PAYLOAD_ID = new CustomPayload.Id<>(ID);
 
     //Codec for serialization, deserialization our data for the client sync
     public static final PacketCodec<PacketByteBuf,SyncPacket> PACKET_CODEC = PacketCodec.tuple(
+            PacketCodecs.codec(Uuids.CODEC), SyncPacket::playerUuid,
             PacketCodecs.codec(RegistryKey.createCodec(RegistryKeys.WORLD)), SyncPacket::worldKey,
             PacketCodecs.codec(LockedAxisData.CODEC), SyncPacket::data,
             PacketCodecs.DOUBLE, SyncPacket::coordTolerance,

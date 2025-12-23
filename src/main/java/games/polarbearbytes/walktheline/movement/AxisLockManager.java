@@ -4,7 +4,6 @@ import com.mojang.datafixers.util.Pair;
 import games.polarbearbytes.walktheline.WalkTheLine;
 import games.polarbearbytes.walktheline.config.ConfigManager;
 import games.polarbearbytes.walktheline.config.WalkTheLineConfig;
-import games.polarbearbytes.walktheline.network.OtherPlayerSyncPacket;
 import games.polarbearbytes.walktheline.network.SyncPacket;
 import games.polarbearbytes.walktheline.state.LockedAxisData;
 import games.polarbearbytes.walktheline.state.PlayerState;
@@ -22,6 +21,7 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
@@ -227,7 +227,7 @@ public class AxisLockManager {
                 }
             }
         }
-        LockedAxisData data = new LockedAxisData(axis, coordinate);
+        LockedAxisData data = new LockedAxisData(axis, coordinate, Formatting.RED);
         syncToClient(player,worldKey,data,PlayerState.get().getEnabled(player));
         return data;
     }
@@ -244,15 +244,12 @@ public class AxisLockManager {
     public static void syncToClient(ServerPlayerEntity player, RegistryKey<World> worldKey, LockedAxisData data, Boolean enabled) {
         WalkTheLineConfig cfg = ConfigManager.getConfig();
 
-        // For main player
-        SyncPacket packet = new SyncPacket(worldKey,data, cfg.coordinateTolerance, enabled);
-        ServerPlayNetworking.send(player, packet);
+        // create a packet
+        SyncPacket packet = new SyncPacket(player.getUuid(), worldKey,data, cfg.coordinateTolerance, enabled);
 
-        // For other player
-        OtherPlayerSyncPacket otherPlayerSyncPacket = new OtherPlayerSyncPacket(worldKey, data, enabled);
+        // broadcast to all
         player.getEntityWorld().getServer().getPlayerManager().getPlayerList().forEach(p -> {
-            if(p == player) return;
-            ServerPlayNetworking.send(p, otherPlayerSyncPacket);
+            ServerPlayNetworking.send(p, packet);
         });
     }
 }

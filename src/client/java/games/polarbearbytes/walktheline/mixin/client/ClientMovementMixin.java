@@ -1,7 +1,7 @@
 package games.polarbearbytes.walktheline.mixin.client;
 
+import games.polarbearbytes.walktheline.WalkTheLineClient;
 import games.polarbearbytes.walktheline.config.WalkTheLineClientConfig;
-import games.polarbearbytes.walktheline.state.LockedAxisData;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Direction;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +16,10 @@ public class ClientMovementMixin {
         Entity self = (Entity) (Object) this;
         if(!self.isPlayer() || !self.getEntityWorld().isClient() || !WalkTheLineClientConfig.modEnabled) return;
 
-        LockedAxisData data = WalkTheLineClientConfig.getLockedAxisData(self.getEntityWorld());
+        var worldAxisCache = WalkTheLineClient.lockedAxisDataCache.get(self.getEntityWorld().getRegistryKey());
+        if(worldAxisCache == null) return;
+
+        var data = worldAxisCache.get(self.getUuid());
         if(data == null) return;
 
         double x = self.getX();

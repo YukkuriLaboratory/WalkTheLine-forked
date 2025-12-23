@@ -1,7 +1,6 @@
 package games.polarbearbytes.walktheline;
 
 import games.polarbearbytes.walktheline.movement.AxisLockManager;
-import games.polarbearbytes.walktheline.network.OtherPlayerSyncPacket;
 import games.polarbearbytes.walktheline.network.SyncPacket;
 import games.polarbearbytes.walktheline.state.PlayerState;
 import games.polarbearbytes.walktheline.util.PosUtil;
@@ -23,7 +22,6 @@ public class ServerEvents {
         ServerWorldEvents.LOAD.register((server, world) -> WalkTheLine.server = server);
         AxisLockManager.register();
         PayloadTypeRegistry.playS2C().register(SyncPacket.PAYLOAD_ID, SyncPacket.PACKET_CODEC);
-        PayloadTypeRegistry.playS2C().register(OtherPlayerSyncPacket.PAYLOAD_ID, OtherPlayerSyncPacket.PACKET_CODEC);
 
         /*
         Our command for enabling / disabling the mod for a save
@@ -32,6 +30,7 @@ public class ServerEvents {
         from being able to disable mod, do stuff and then re-enable
         */
 
+        // Todo: add change color system
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             // Register only for server-side (both dedicated + integrated worlds)
             if (environment.integrated || environment.dedicated) {
