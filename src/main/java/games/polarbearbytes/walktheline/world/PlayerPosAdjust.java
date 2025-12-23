@@ -9,7 +9,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Direction;
 
 public class PlayerPosAdjust {
-    public static void adjustmentPlayerPosition(ServerPlayerEntity player) {
+    public static void apply(ServerPlayerEntity player) {
         LockedAxisData data = WTLComponents.lockedAxis(player.getEntityWorld()).getLockedAxisData(player.getUuid());
         if (data == null) return;
 

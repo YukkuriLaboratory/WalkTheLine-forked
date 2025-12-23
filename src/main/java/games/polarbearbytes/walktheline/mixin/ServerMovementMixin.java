@@ -16,7 +16,7 @@ public abstract class ServerMovementMixin {
     private void restrictMovement(CallbackInfo ci) {
         Entity self = (Entity) (Object) this;
         if (self instanceof ServerPlayerEntity player && WTLComponents.playerState(player).isEnabled()) {
-            PlayerPosAdjust.adjustmentPlayerPosition(player);
+            PlayerPosAdjust.apply(player);
         }
     }
 }
