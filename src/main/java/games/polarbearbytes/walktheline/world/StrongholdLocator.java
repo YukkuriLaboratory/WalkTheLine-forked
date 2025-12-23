@@ -21,7 +21,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.gen.structure.Structure;
 import net.minecraft.world.gen.structure.StructureType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -30,24 +30,6 @@ import java.util.Map;
  * Class for locating the nearest stronghold based on passed location
  */
 public class StrongholdLocator {
-
-    /**
-     * Gets the registry list of stronghold structures
-     * @return List of stronghold structures
-     */
-    public static RegistryEntryList<Structure> getStrongholdList(){
-        //long seed = WalkTheLine.server.getOverworld().getSeed();
-
-        RegistryWrapper.WrapperLookup registryManager = WalkTheLine.server.getOverworld().getRegistryManager();
-        RegistryEntryLookup<Structure> structureRegistry = registryManager.getOrThrow(RegistryKeys.STRUCTURE);
-
-        RegistryKey<Structure> strongholdKey = RegistryKey.of(RegistryKeys.STRUCTURE, Identifier.of("stronghold"));
-        RegistryEntry<Structure> strongholdEntry = structureRegistry.getOptional(strongholdKey)
-                .orElseThrow(() -> new IllegalStateException("Stronghold not found in registry"));
-
-        return RegistryEntryList.of(strongholdEntry);
-    }
-
     /**
      * Using the passed position, find closest stronghole, traverse the StrongholdStructure children pieces
      * to find the portal room and coordinates for the portal frame
@@ -55,6 +37,7 @@ public class StrongholdLocator {
      * @param locationPos The location to search from for closest Stronghold
      * @return Pair containing the position of the portal frame and its facing direction
      */
+    @Nullable
     public static Pair<BlockPos, Direction> getClosestStrongHoldPortalroom(BlockPos locationPos){
         ServerWorld serverWorld = WalkTheLine.server.getOverworld();
         RegistryEntryList<Structure> list = getStrongholdList();
@@ -115,6 +98,23 @@ public class StrongholdLocator {
             }
         }
         return null;
+    }
+
+    /**
+     * Gets the registry list of stronghold structures
+     * @return List of stronghold structures
+     */
+    private static RegistryEntryList<Structure> getStrongholdList(){
+        //long seed = WalkTheLine.server.getOverworld().getSeed();
+
+        RegistryWrapper.WrapperLookup registryManager = WalkTheLine.server.getOverworld().getRegistryManager();
+        RegistryEntryLookup<Structure> structureRegistry = registryManager.getOrThrow(RegistryKeys.STRUCTURE);
+
+        RegistryKey<Structure> strongholdKey = RegistryKey.of(RegistryKeys.STRUCTURE, Identifier.of("stronghold"));
+        RegistryEntry<Structure> strongholdEntry = structureRegistry.getOptional(strongholdKey)
+                .orElseThrow(() -> new IllegalStateException("Stronghold not found in registry"));
+
+        return RegistryEntryList.of(strongholdEntry);
     }
 
     private static @Nullable Chunk getWorldChunk(Pair<BlockPos, RegistryEntry<Structure>> pair, ServerWorld serverWorld) {
