@@ -43,7 +43,7 @@ public class SimpleColorLine extends LineBase {
         var viewDistance = client.options.getViewDistance().getValue();
         client.world.getPlayers().forEach(p -> {
             LogUtils.getLogger().debug("Rendered for {}", p.getStringifiedName());
-            renderRainbowLine(cameraPos, entity, lockedAxis.getLockedAxisData(p.getUuid()), viewDistance);
+            renderRainbowLine(cameraPos, p, lockedAxis.getLockedAxisData(p.getUuid()), viewDistance);
         });
     }
 
