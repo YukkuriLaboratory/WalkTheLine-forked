@@ -1,4 +1,4 @@
-package games.polarbearbytes.walktheline.state;
+package games.polarbearbytes.walktheline.axis;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

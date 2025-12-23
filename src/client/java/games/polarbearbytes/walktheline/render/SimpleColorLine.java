@@ -1,9 +1,9 @@
 package games.polarbearbytes.walktheline.render;
 
 import games.polarbearbytes.walktheline.WalkTheLine;
+import games.polarbearbytes.walktheline.axis.LockedAxisData;
 import games.polarbearbytes.walktheline.component.WTLComponents;
 import games.polarbearbytes.walktheline.config.WalkTheLineClientConfig;
-import games.polarbearbytes.walktheline.state.LockedAxisData;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BuiltBuffer;

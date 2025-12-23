@@ -1,7 +1,7 @@
 package games.polarbearbytes.walktheline.component;
 
 import com.mojang.serialization.Codec;
-import games.polarbearbytes.walktheline.state.LockedAxisData;
+import games.polarbearbytes.walktheline.axis.LockedAxisData;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.util.Uuids;

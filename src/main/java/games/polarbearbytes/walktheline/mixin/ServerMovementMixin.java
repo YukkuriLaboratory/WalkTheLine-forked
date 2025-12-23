@@ -1,7 +1,7 @@
 package games.polarbearbytes.walktheline.mixin;
 
 import games.polarbearbytes.walktheline.component.WTLComponents;
-import games.polarbearbytes.walktheline.util.Utils;
+import games.polarbearbytes.walktheline.world.PlayerPosAdjust;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -16,7 +16,7 @@ public abstract class ServerMovementMixin {
     private void restrictMovement(CallbackInfo ci) {
         Entity self = (Entity) (Object) this;
         if (self instanceof ServerPlayerEntity player && WTLComponents.playerState(player).isEnabled()) {
-            Utils.adjustmentPlayerPosition(player);
+            PlayerPosAdjust.adjustmentPlayerPosition(player);
         }
     }
 }

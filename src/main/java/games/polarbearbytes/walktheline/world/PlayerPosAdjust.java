@@ -1,33 +1,14 @@
-package games.polarbearbytes.walktheline.util;
+package games.polarbearbytes.walktheline.world;
 
+import games.polarbearbytes.walktheline.axis.AxisLockManager;
+import games.polarbearbytes.walktheline.axis.LockedAxisData;
 import games.polarbearbytes.walktheline.component.WTLComponents;
 import games.polarbearbytes.walktheline.config.ConfigManager;
 import games.polarbearbytes.walktheline.config.WalkTheLineConfig;
-import games.polarbearbytes.walktheline.movement.AxisLockManager;
-import games.polarbearbytes.walktheline.state.LockedAxisData;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
 
-/**
- * Utility functions
- */
-public class Utils {
-    public static double getPlayerCoordAlongLockedAxis(PlayerEntity player, Axis axis) {
-        return (axis == Axis.X) ? player.getX() : player.getZ();
-    }
-
-    public static int colorHexToInt(String colorHex) {
-        String[] rgba = colorHex.split("(?<=\\G.{2})");
-        int r = Integer.parseInt(rgba[0], 16);
-        int g = Integer.parseInt(rgba[1], 16);
-        int b = Integer.parseInt(rgba[2], 16);
-        int a = Integer.parseInt(rgba[3], 16);
-
-        return (a << 24) | (r << 16) | (g << 8) | b;
-    }
-
+public class PlayerPosAdjust {
     public static void adjustmentPlayerPosition(ServerPlayerEntity player) {
         LockedAxisData data = WTLComponents.lockedAxis(player.getEntityWorld()).getLockedAxisData(player.getUuid());
         if (data == null) return;

@@ -1,17 +1,14 @@
-package games.polarbearbytes.walktheline.movement;
+package games.polarbearbytes.walktheline.axis;
 
 import com.mojang.datafixers.util.Pair;
 import games.polarbearbytes.walktheline.WalkTheLine;
 import games.polarbearbytes.walktheline.component.WTLComponents;
 import games.polarbearbytes.walktheline.config.ConfigManager;
-import games.polarbearbytes.walktheline.state.LockedAxisData;
-import games.polarbearbytes.walktheline.util.PosUtil;
-import games.polarbearbytes.walktheline.util.Utils;
-import games.polarbearbytes.walktheline.util.WorldUtil;
 import games.polarbearbytes.walktheline.world.StrongholdLocator;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
@@ -48,11 +45,11 @@ public class AxisLockManager {
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, from, to) -> {
             if(!WTLComponents.playerState(player).isEnabled()) return; // return if non-enabled player
             var axisData = WTLComponents.lockedAxis(to);
-            boolean isInEnd = WorldUtil.isTheEnd(to);
+            boolean isInEnd = StrongholdLocator.WorldUtil.isTheEnd(to);
             if(isInEnd) {
                 WalkTheLine.LOGGER.debug("Now, player is in the end!");
                 WalkTheLine.server.getPlayerManager().getPlayerList().forEach(p -> {
-                    if(WorldUtil.isTheEnd(p.getEntityWorld())) return; // ignore player who is in the end
+                    if(StrongholdLocator.WorldUtil.isTheEnd(p.getEntityWorld())) return; // ignore player who is in the end
                     p.teleport(
                             player.getEntityWorld(),
                             player.getX(),
@@ -87,8 +84,8 @@ public class AxisLockManager {
      * @param data The locked axis and coordinate data
      */
     public static boolean checkDistanceFromLockedAxis(ServerPlayerEntity player, LockedAxisData data){
-        if(WorldUtil.isTheEnd(player.getEntityWorld())) return true;
-        double coordinate = Utils.getPlayerCoordAlongLockedAxis(player, data.axis());
+        if(StrongholdLocator.WorldUtil.isTheEnd(player.getEntityWorld())) return true;
+        double coordinate = getPlayerCoordAlongLockedAxis(player, data.axis());
         double distance = coordinate - data.coordinate();
         Entity entity;
 
@@ -113,12 +110,12 @@ public class AxisLockManager {
             switch(data.axis()){
                 case X -> {
                     Vec3d newPos = new Vec3d(data.coordinate(), pos.getY(), pos.getZ());
-                    double y = PosUtil.findSafeYAbove(player, newPos);
+                    double y = StrongholdLocator.WorldUtil.findSafeYAbove(player, newPos);
                     entity.teleport(world, newPos.getX(), y, newPos.getZ() ,EnumSet.noneOf(PositionFlag.class),player.getYaw(),player.getPitch(),false);
                 }
                 case Z -> {
                     Vec3d newPos = new Vec3d(pos.getX(), pos.getY(), data.coordinate());
-                    double y = PosUtil.findSafeYAbove(player, newPos);
+                    double y = StrongholdLocator.WorldUtil.findSafeYAbove(player, newPos);
                     entity.teleport(world, newPos.getX(), y, newPos.getZ(),EnumSet.noneOf(PositionFlag.class),player.getYaw(),player.getPitch(),false);
                 }
             }
@@ -209,5 +206,9 @@ public class AxisLockManager {
             }
         }
         return new LockedAxisData(WTLComponents.playerState(player).isEnabled(), axis, coordinate, Formatting.RED);
+    }
+
+    public static double getPlayerCoordAlongLockedAxis(PlayerEntity player, Axis axis) {
+        return (axis == Axis.X) ? player.getX() : player.getZ();
     }
 }

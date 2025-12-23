@@ -1,7 +1,7 @@
 package games.polarbearbytes.walktheline.component;
 
 import games.polarbearbytes.walktheline.WalkTheLine;
-import games.polarbearbytes.walktheline.state.LockedAxisData;
+import games.polarbearbytes.walktheline.axis.LockedAxisData;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;

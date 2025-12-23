@@ -1,8 +1,8 @@
 package games.polarbearbytes.walktheline;
 
+import games.polarbearbytes.walktheline.axis.AxisLockManager;
 import games.polarbearbytes.walktheline.component.WTLComponents;
-import games.polarbearbytes.walktheline.movement.AxisLockManager;
-import games.polarbearbytes.walktheline.util.PosUtil;
+import games.polarbearbytes.walktheline.world.StrongholdLocator;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
@@ -71,7 +71,7 @@ public class ServerEvents {
                                             var crossX = data.coordinate();
                                             var crossZ = otherData.coordinate();
                                             var crossVec = new Vec3d(crossX, 65, crossZ);
-                                            var crossY = PosUtil.findSafeYAbove(player, crossVec);
+                                            var crossY = StrongholdLocator.WorldUtil.findSafeYAbove(player, crossVec);
 
                                             // teleport all players to cross point
                                             var tpVec = new Vec3d(crossX, crossY, crossZ);
