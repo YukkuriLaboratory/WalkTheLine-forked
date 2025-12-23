@@ -4,7 +4,6 @@ import games.polarbearbytes.walktheline.WalkTheLine;
 import games.polarbearbytes.walktheline.WalkTheLineClient;
 import games.polarbearbytes.walktheline.config.WalkTheLineClientConfig;
 import games.polarbearbytes.walktheline.state.LockedAxisData;
-import games.polarbearbytes.walktheline.util.Utils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BuiltBuffer;
@@ -16,9 +15,6 @@ import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import java.awt.*;
-import java.time.LocalTime;
-
 /**
  * RainbowLine creates a line with a rotating color
  *
@@ -26,10 +22,10 @@ import java.time.LocalTime;
  * @version 1.0
  * @since 2025-07-24
  */
-public class RainbowLine extends LineBase {
-    public final static RainbowLine INSTANCE = new RainbowLine();
+public class SimpleColorLine extends LineBase {
+    public final static SimpleColorLine INSTANCE = new SimpleColorLine();
 
-    protected RainbowLine(){
+    protected SimpleColorLine(){
         this.lineThickness = 8;
     }
 
@@ -83,8 +79,11 @@ public class RainbowLine extends LineBase {
         Vec3d rightStart = lineStart.offset(perpendicularDirections[1],lineOffset);
         Vec3d rightEnd = lineEnd.offset(perpendicularDirections[1],-tolerance);
 
-        buildFace(leftStart, leftEnd, lineBuilder, cameraPos, config, entity.getEntityWorld());
-        buildFace(rightStart, rightEnd, lineBuilder, cameraPos, config, entity.getEntityWorld());
+        Integer lineColor = axisData.color().getColorValue();
+        if(lineColor == null) lineColor = 0;
+
+        buildFace(leftStart, leftEnd, lineBuilder, cameraPos, config, entity.getEntityWorld(), lineColor);
+        buildFace(rightStart, rightEnd, lineBuilder, cameraPos, config, entity.getEntityWorld(), lineColor);
 
         try {
             BuiltBuffer lineMeshData = lineBuilder.endNullable();
@@ -97,7 +96,7 @@ public class RainbowLine extends LineBase {
         }
     }
 
-    public void buildFace(Vec3d start, Vec3d end, BufferBuilder builder, Vec3d cameraPos, WalkTheLineClientConfig config, World world){
+    public void buildFace(Vec3d start, Vec3d end, BufferBuilder builder, Vec3d cameraPos, WalkTheLineClientConfig config, World world, int lineColor){
         float x1 = (float)(start.getX() - cameraPos.x);
         float y1 = (float)(start.getY() - cameraPos.y);
         float z1 = (float)(start.getZ() - cameraPos.z);
@@ -105,16 +104,16 @@ public class RainbowLine extends LineBase {
         float y2 = (float)(end.getY() - cameraPos.y);
         float z2 = (float)(end.getZ() - cameraPos.z);
 
-        int lineColor;
-        if( config.rotatingColor ) {
-            float speed = 0.2f; // smaller = slower, larger = faster
-            float seconds = (float) (LocalTime.now().toNanoOfDay() / 1_000_000_000.0);
-            float hue = (seconds * speed) % 1.0f; // loop hue every (1 / speed) seconds
-            lineColor = Color.HSBtoRGB(hue, 1.0f, 1.0f);
-            lineColor = (lineColor & 0x00FFFFFF) | ((255 * (config.rotatingColorAlpha/100)) << 24);
-        } else {
-            lineColor = Utils.colorHexToInt(config.singleColor.replace("#",""));
-        }
+//        int lineColor;
+//        if( config.rotatingColor ) {
+//            float speed = 0.2f; // smaller = slower, larger = faster
+//            float seconds = (float) (LocalTime.now().toNanoOfDay() / 1_000_000_000.0);
+//            float hue = (seconds * speed) % 1.0f; // loop hue every (1 / speed) seconds
+//            lineColor = Color.HSBtoRGB(hue, 1.0f, 1.0f);
+//            lineColor = (lineColor & 0x00FFFFFF) | ((255 * (config.rotatingColorAlpha/100)) << 24);
+//        } else {
+//            lineColor = Utils.colorHexToInt(config.singleColor.replace("#",""));
+//        }
 
         BlockPos pos;
         int light;

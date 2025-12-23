@@ -9,13 +9,6 @@ import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 @Config(name = "walk-the-line-client")
 public class WalkTheLineClientConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
-    public boolean rotatingColor = true;
-    @ConfigEntry.Gui.Tooltip
-    @ConfigEntry.BoundedDiscrete(min=1, max=100)
-    public int rotatingColorAlpha = 100;
-    @ConfigEntry.Gui.Tooltip
-    public String singleColor = "#FF0000FF";
-    @ConfigEntry.Gui.Tooltip
     @ConfigEntry.BoundedDiscrete(min=1, max=100)
     public int lineWidth = 25;
 

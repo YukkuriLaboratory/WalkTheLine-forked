@@ -29,7 +29,7 @@ public class LineRenderer implements IRenderer {
     }
 
     private LineRenderer(){
-        this.lineRenderers.add(RainbowLine.INSTANCE);
+        this.lineRenderers.add(SimpleColorLine.INSTANCE);
     }
 
     public void render(Framebuffer framebuffer, Matrix4f positionMatrix, Matrix4f projectionMatrix, MinecraftClient client, FrameGraphBuilder frameGraphBuilder, DefaultFramebufferSet fbSet, Frustum frustum, Camera camera, BufferBuilderStorage buffers, Profiler profiler){
