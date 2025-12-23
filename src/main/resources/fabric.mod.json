@@ -40,7 +40,8 @@
 	],
     "custom": {
         "cardinal-components": [
-            "walk-the-line:locked_axis"
+            "walk-the-line:locked_axis",
+            "walk-the-line:player_state"
         ]
     },
 	"depends": {

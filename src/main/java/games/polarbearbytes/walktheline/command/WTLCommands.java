@@ -6,6 +6,7 @@ import games.polarbearbytes.walktheline.WalkTheLine;
 import games.polarbearbytes.walktheline.axis.AxisLockManager;
 import games.polarbearbytes.walktheline.component.WTLComponents;
 import games.polarbearbytes.walktheline.world.PlayerPosAdjust;
+import games.polarbearbytes.walktheline.world.StrongholdLocator;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.argument.ColorArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -13,6 +14,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.math.Vec3d;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
@@ -64,9 +66,12 @@ public class WTLCommands {
                     ctx.getSource().sendFeedback(() -> Text.literal("Failed to teleport"), false);
                     return 1;
                 }
+                Vec3d pos = new Vec3d(crossPoint.getX(), crossPoint.getY(), crossPoint.getZ());
+                var safeY = StrongholdLocator.WorldUtil.findSafeYAbove(ctx.getSource().getPlayer().getEntityWorld(), pos);
                 ctx.getSource().getServer().getPlayerManager().getPlayerList().forEach(p -> {
-                    p.teleport(crossPoint.getX(), crossPoint.getY(), crossPoint.getZ(), true);
+                    p.requestTeleport(pos.x, safeY, pos.z);
                 });
+                ctx.getSource().sendFeedback(() -> Text.literal("Teleported! -> " + crossPoint.toShortString()), false);
                 return 1;
             }))
             .then(literal("setcolor")
@@ -85,7 +90,7 @@ public class WTLCommands {
                                 if(data == null) return 1;
                                 data.setColor(color);
                                 lockedAxis.setLockedAxisData(playerUuid, data);
-                                ctx.getSource().sendFeedback(() -> Text.translatable("walktheline.cmd.walktheline.setcolor.changed"), false);
+                                ctx.getSource().sendFeedback(() -> Text.translatable("walktheline.cmd.walktheline.setcolor.changed", ctx.getSource().getPlayer().getStringifiedName(), color.getName()), false);
                                 return 1;
                             })))
             );

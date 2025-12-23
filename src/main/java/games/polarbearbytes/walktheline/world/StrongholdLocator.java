@@ -10,7 +10,6 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.entry.RegistryEntryList;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StrongholdGenerator;
 import net.minecraft.structure.StructurePiece;
@@ -133,12 +132,10 @@ public class StrongholdLocator {
          * When teleporting player find a safe space to teleport player
          * Block beneath player needs to not be air, block at foot and head level need to be air
          *
-         * @param player The server entity representing the player
          * @param position The position we want to teleport to
          * @return The Y coordinate that we have determined to be safe
          */
-        public static double findSafeYAbove(ServerPlayerEntity player, Vec3d position) {
-            ServerWorld world = player.getEntityWorld();
+        public static double findSafeYAbove(ServerWorld world, Vec3d position) {
             BlockPos.Mutable mutablePosition = new BlockPos.Mutable((int) Math.floor(position.getX()), world.getHeight(), (int) Math.floor(position.getZ()));
             int bottom = world.getBottomY();
             boolean isHeadAir = world.getBlockState(mutablePosition).isAir();

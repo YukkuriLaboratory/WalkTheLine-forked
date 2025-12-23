@@ -114,12 +114,12 @@ public class AxisLockManager {
             switch(data.axis()){
                 case X -> {
                     Vec3d newPos = new Vec3d(data.coordinate(), pos.getY(), pos.getZ());
-                    double y = StrongholdLocator.WorldUtil.findSafeYAbove(player, newPos);
+                    double y = StrongholdLocator.WorldUtil.findSafeYAbove(player.getEntityWorld(), newPos);
                     entity.teleport(world, newPos.getX(), y, newPos.getZ() ,EnumSet.noneOf(PositionFlag.class),player.getYaw(),player.getPitch(),false);
                 }
                 case Z -> {
                     Vec3d newPos = new Vec3d(pos.getX(), pos.getY(), data.coordinate());
-                    double y = StrongholdLocator.WorldUtil.findSafeYAbove(player, newPos);
+                    double y = StrongholdLocator.WorldUtil.findSafeYAbove(player.getEntityWorld(), newPos);
                     entity.teleport(world, newPos.getX(), y, newPos.getZ(),EnumSet.noneOf(PositionFlag.class),player.getYaw(),player.getPitch(),false);
                 }
             }
