@@ -5,7 +5,9 @@ import games.polarbearbytes.walktheline.axis.LockedAxisData;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.util.Uuids;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
@@ -15,6 +17,7 @@ import java.util.UUID;
 
 public class LockedAxisComponent implements Component, AutoSyncedComponent {
     private final World world;
+    @Nullable private Vec3i crossPoint = null;
     private HashMap<UUID, LockedAxisData> axisMap = new HashMap<>();
 
     public LockedAxisComponent(World world) {
@@ -43,6 +46,16 @@ public class LockedAxisComponent implements Component, AutoSyncedComponent {
 
     public void setLockedAxisData(UUID playerUuid, LockedAxisData data) {
         axisMap.put(playerUuid, data);
+        WTLComponents.LOCKED_AXIS.sync(world);
+    }
+
+    @Nullable
+    public Vec3i getCrossPoint() {
+        return this.crossPoint;
+    }
+
+    public void setCrossPoint(@NonNull Vec3i crossPoint) {
+        this.crossPoint = crossPoint;
         WTLComponents.LOCKED_AXIS.sync(world);
     }
 }

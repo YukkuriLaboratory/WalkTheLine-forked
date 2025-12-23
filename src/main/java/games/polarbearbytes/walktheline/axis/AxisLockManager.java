@@ -19,6 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
 import java.util.EnumSet;
@@ -45,6 +46,9 @@ public class AxisLockManager {
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, from, to) -> {
             if(!WTLComponents.playerState(player).isEnabled()) return; // return if non-enabled player
             var axisData = WTLComponents.lockedAxis(to);
+            if(axisData.getCrossPoint() == null) {
+                determineDimensionLocks(player, player.getEntityWorld().getRegistryKey(), WTLComponents.lockedAxis(from).getLockedAxisData(player.getUuid()).axis() == Axis.X);
+            }
             boolean isInEnd = StrongholdLocator.WorldUtil.isTheEnd(to);
             if(isInEnd) {
                 WalkTheLine.LOGGER.debug("Now, player is in the end!");
@@ -171,31 +175,32 @@ public class AxisLockManager {
         WalkTheLine.LOGGER.debug("Determining dimension lock for {} in {}", player.getName().getLiteralString(), worldKey.getValue().getPath());
         switch (worldKey.getValue().getPath()) {
             case "overworld" -> {
-                //Get the overworld's spawn location
-                BlockPos spawnPosition = player.getEntityWorld().getSpawnPoint().getPos();
-
-                //Find the closest stronghold and return position and axis
-                Pair<BlockPos, Direction> locationPair = StrongholdLocator.getClosestStrongHoldPortalroom(spawnPosition);
-                if(locationPair == null || locationPair.getFirst() == null) return null;
-                BlockPos pos = locationPair.getFirst();
-
                 // Check if a primary axis exists for this save
                 // If it does, use the opposite axis for this player
-                if (isPrimary) {
-                    axis = Axis.Z;
-                    coordinate = pos.toCenterPos().getComponentAlongAxis(axis) + player.getRandom().nextBetween(-400, 400);
-                } else {
-                    axis = Axis.X;
-                    coordinate = pos.toCenterPos().getComponentAlongAxis(axis);
+                var lockedAxis = WTLComponents.lockedAxis(player.getEntityWorld());
+                Vec3i crossPoint = lockedAxis.getCrossPoint();
+                if(crossPoint == null) {
+                    //Get the overworld's spawn location
+                    BlockPos spawnPosition = player.getEntityWorld().getSpawnPoint().getPos();
+
+                    //Find the closest stronghold and return position and axis
+                    Pair<BlockPos, Direction> locationPair = StrongholdLocator.getClosestStrongHoldPortalroom(spawnPosition);
+                    if(locationPair == null || locationPair.getFirst() == null) return null;
+                    BlockPos pos = locationPair.getFirst();
+                    crossPoint = new Vec3i(pos.getX(), 60, pos.getZ() + (player.getRandom().nextBetween(230, 500) * (player.getRandom().nextBoolean() ? 1: -1)));
+                    lockedAxis.setCrossPoint(crossPoint);
                 }
+
+                axis = isPrimary ? Axis.X: Axis.Z;
+                coordinate = crossPoint.getComponentAlongAxis(axis) + 0.5d;
 
                 WalkTheLine.LOGGER.info("Update {}'s axis: {} / coord: {}", player.getStringifiedName(), axis.asString(), coordinate);
             }
             case "the_nether" -> {
                 ServerWorld nether = player.getEntityWorld().getServer().getWorld(World.NETHER);
                 if(nether == null) return null;
-                LockedAxisData data = WTLComponents.lockedAxis(server.getOverworld()).getLockedAxisData(player.getUuid());
-                if(data == null) return null;
+                var lockedAxis = WTLComponents.lockedAxis(nether);
+                var data = lockedAxis.getLockedAxisData(player.getUuid());
                 axis = data.axis();
                 coordinate = Math.floor(player.getEntityPos().getComponentAlongAxis(axis)) + 0.5d;
             }
