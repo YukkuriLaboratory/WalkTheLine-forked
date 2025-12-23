@@ -1,7 +1,7 @@
 package games.polarbearbytes.walktheline.render;
 
 import games.polarbearbytes.walktheline.WalkTheLine;
-import games.polarbearbytes.walktheline.WalkTheLineClient;
+import games.polarbearbytes.walktheline.component.WTLComponents;
 import games.polarbearbytes.walktheline.config.WalkTheLineClientConfig;
 import games.polarbearbytes.walktheline.state.LockedAxisData;
 import net.minecraft.client.MinecraftClient;
@@ -9,6 +9,7 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
@@ -37,17 +38,16 @@ public class SimpleColorLine extends LineBase {
     @Override
     public void render(Vec3d cameraPos, Entity entity, MinecraftClient client) {
         if(client.world == null) return;
-        var lineMap = WalkTheLineClient.lockedAxisDataCache.get(client.world.getRegistryKey());
-        if(lineMap == null) return;
+        var lockedAxis = WTLComponents.lockedAxis(client.world);
         var viewDistance = client.options.getViewDistance().getValue();
-        lineMap.forEach((k,v) -> {
-            renderRainbowLine(cameraPos, entity, v, viewDistance);
+        client.world.getPlayers().forEach(p -> {
+            renderRainbowLine(cameraPos, entity, lockedAxis.getLockedAxisData(p.getUuid()), viewDistance);
         });
     }
 
     public void renderRainbowLine(Vec3d cameraPos, Entity entity, LockedAxisData axisData, int viewDistance) {
-        if(lastEntityPosition == null || axisData == null) return;
-        double tolerance = WalkTheLineClientConfig.tolerance;
+        if(lastEntityPosition == null || axisData == null || !(entity instanceof PlayerEntity player)) return;
+        double tolerance = WTLComponents.playerState(player).getCoordTolerance();
 
         BufferBuilder lineBuilder = this.renderContext.init();
 
@@ -71,7 +71,7 @@ public class SimpleColorLine extends LineBase {
             lineEnd = new Vec3d(axisData.coordinate(), lineEnd.getY(), lineEnd.getZ());
         }
 
-        float lineOffset = (float)-WalkTheLineClientConfig.tolerance - lineWidth;
+        float lineOffset = (float)-tolerance - lineWidth;
 
         Vec3d leftStart = lineStart.offset(perpendicularDirections[0],lineOffset);
         Vec3d leftEnd = lineEnd.offset(perpendicularDirections[0],-tolerance);

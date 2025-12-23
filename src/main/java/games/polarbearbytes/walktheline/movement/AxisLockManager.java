@@ -4,8 +4,6 @@ import com.mojang.datafixers.util.Pair;
 import games.polarbearbytes.walktheline.WalkTheLine;
 import games.polarbearbytes.walktheline.component.WTLComponents;
 import games.polarbearbytes.walktheline.config.ConfigManager;
-import games.polarbearbytes.walktheline.config.WalkTheLineConfig;
-import games.polarbearbytes.walktheline.network.SyncPacket;
 import games.polarbearbytes.walktheline.state.LockedAxisData;
 import games.polarbearbytes.walktheline.util.PosUtil;
 import games.polarbearbytes.walktheline.util.Utils;
@@ -13,7 +11,6 @@ import games.polarbearbytes.walktheline.util.WorldUtil;
 import games.polarbearbytes.walktheline.world.StrongholdLocator;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.registry.RegistryKey;
@@ -51,7 +48,6 @@ public class AxisLockManager {
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, from, to) -> {
             if(!WTLComponents.playerState(player).isEnabled()) return; // return if non-enabled player
             var axisData = WTLComponents.lockedAxis(to);
-            LockedAxisData lockedAxisData = axisData.getLockedAxisData(player.getUuid());
             boolean isInEnd = WorldUtil.isTheEnd(to);
             if(isInEnd) {
                 WalkTheLine.LOGGER.debug("Now, player is in the end!");
@@ -69,7 +65,6 @@ public class AxisLockManager {
                     );
                 });
             }
-            syncToClient(player,to.getRegistryKey(),lockedAxisData);
         });
 
         /*
@@ -82,7 +77,6 @@ public class AxisLockManager {
             LockedAxisData lockedAxisData = WTLComponents.lockedAxis(player.getEntityWorld()).getLockedAxisData(player.getUuid());
 
             if(lockedAxisData == null) return;
-            syncToClient(player,worldKey,lockedAxisData);
         });
     }
 
@@ -174,7 +168,6 @@ public class AxisLockManager {
      */
     public static LockedAxisData determineDimensionLocks(ServerPlayerEntity player, RegistryKey<World> worldKey, boolean isPrimary) {
         MinecraftServer server = player.getEntityWorld().getServer();
-        String saveName = server.getSaveProperties().getLevelName();
         Axis axis;
         double coordinate;
 
@@ -215,28 +208,6 @@ public class AxisLockManager {
                 coordinate = 0.5d;
             }
         }
-        LockedAxisData data = new LockedAxisData(WTLComponents.playerState(player).isEnabled(), axis, coordinate, Formatting.RED);
-        syncToClient(player,worldKey,data);
-        return data;
-    }
-
-    /**
-     * Send a packet to the client side so it can know where to display
-     * the locked axis line indicator
-     *
-     * @param player The server entity representing the player
-     * @param worldKey The registry key for the world (dimension)
-     * @param data The locked axis and coordinate data
-     */
-    public static void syncToClient(ServerPlayerEntity player, RegistryKey<World> worldKey, LockedAxisData data) {
-        WalkTheLineConfig cfg = ConfigManager.getConfig();
-
-        // create a packet
-        SyncPacket packet = new SyncPacket(player.getUuid(), worldKey,data, cfg.coordinateTolerance);
-
-        // broadcast to all
-        player.getEntityWorld().getServer().getPlayerManager().getPlayerList().forEach(p -> {
-            ServerPlayNetworking.send(p, packet);
-        });
+        return new LockedAxisData(WTLComponents.playerState(player).isEnabled(), axis, coordinate, Formatting.RED);
     }
 }

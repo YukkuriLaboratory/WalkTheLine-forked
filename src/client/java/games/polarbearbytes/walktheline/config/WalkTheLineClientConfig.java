@@ -12,18 +12,8 @@ public class WalkTheLineClientConfig implements ConfigData {
     @ConfigEntry.BoundedDiscrete(min=1, max=100)
     public int lineWidth = 25;
 
-    @ConfigEntry.Gui.Excluded
-    public static double tolerance = 0.5;
-    @ConfigEntry.Gui.Excluded
-    public static boolean modEnabled = false;
-
     public static WalkTheLineClientConfig getConfig(){
         return AutoConfig.getConfigHolder(WalkTheLineClientConfig.class).getConfig();
-    }
-
-    public static void reset(){
-        modEnabled = false;
-        tolerance = 0.5;
     }
 
     public static void register(){

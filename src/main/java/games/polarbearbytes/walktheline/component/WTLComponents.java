@@ -1,6 +1,7 @@
 package games.polarbearbytes.walktheline.component;
 
 import games.polarbearbytes.walktheline.WalkTheLine;
+import games.polarbearbytes.walktheline.state.LockedAxisData;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
@@ -21,6 +22,10 @@ public final class WTLComponents implements WorldComponentInitializer, EntityCom
 
     public static LockedAxisComponent lockedAxis(World provider) {
         return LOCKED_AXIS.get(provider);
+    }
+
+    public static LockedAxisData lockedAxisData(PlayerEntity player) {
+        return LOCKED_AXIS.get(player.getEntityWorld()).getLockedAxisData(player.getUuid());
     }
 
     public static PlayerStateComponent playerState(PlayerEntity player) {

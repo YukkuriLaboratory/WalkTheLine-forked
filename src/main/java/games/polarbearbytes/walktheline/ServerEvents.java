@@ -2,12 +2,10 @@ package games.polarbearbytes.walktheline;
 
 import games.polarbearbytes.walktheline.component.WTLComponents;
 import games.polarbearbytes.walktheline.movement.AxisLockManager;
-import games.polarbearbytes.walktheline.network.SyncPacket;
 import games.polarbearbytes.walktheline.util.PosUtil;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.command.argument.ColorArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -26,7 +24,6 @@ public class ServerEvents {
         ServerLifecycleEvents.SERVER_STARTED.register((server) -> WalkTheLine.server = server);
         ServerWorldEvents.LOAD.register((server, world) -> WalkTheLine.server = server);
         AxisLockManager.register();
-        PayloadTypeRegistry.playS2C().register(SyncPacket.PAYLOAD_ID, SyncPacket.PACKET_CODEC);
 
         /*
         Our command for enabling / disabling the mod for a save
