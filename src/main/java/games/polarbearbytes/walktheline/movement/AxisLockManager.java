@@ -2,12 +2,11 @@ package games.polarbearbytes.walktheline.movement;
 
 import com.mojang.datafixers.util.Pair;
 import games.polarbearbytes.walktheline.WalkTheLine;
+import games.polarbearbytes.walktheline.component.WTLComponents;
 import games.polarbearbytes.walktheline.config.ConfigManager;
 import games.polarbearbytes.walktheline.config.WalkTheLineConfig;
 import games.polarbearbytes.walktheline.network.SyncPacket;
 import games.polarbearbytes.walktheline.state.LockedAxisData;
-import games.polarbearbytes.walktheline.state.PlayerState;
-import games.polarbearbytes.walktheline.state.WorldsData;
 import games.polarbearbytes.walktheline.util.PosUtil;
 import games.polarbearbytes.walktheline.util.Utils;
 import games.polarbearbytes.walktheline.util.WorldUtil;
@@ -50,9 +49,9 @@ public class AxisLockManager {
         along with wither or not the mod is enabled
          */
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, from, to) -> {
-            if(!PlayerState.get().getEnabled(player)) return;
-            WorldsData worldsData = PlayerState.get().getWorldsData(player);
-            LockedAxisData lockedAxisData = PlayerState.get().getLockedAxisData(player);
+            if(!WTLComponents.playerState(player).isEnabled()) return; // return if non-enabled player
+            var axisData = WTLComponents.lockedAxis(to);
+            LockedAxisData lockedAxisData = axisData.getLockedAxisData(player.getUuid());
             boolean isInEnd = WorldUtil.isTheEnd(to);
             if(isInEnd) {
                 WalkTheLine.LOGGER.debug("Now, player is in the end!");
@@ -70,7 +69,7 @@ public class AxisLockManager {
                     );
                 });
             }
-            syncToClient(player,to.getRegistryKey(),lockedAxisData,!isInEnd && worldsData.enabled());
+            syncToClient(player,to.getRegistryKey(),lockedAxisData);
         });
 
         /*
@@ -78,13 +77,12 @@ public class AxisLockManager {
         we return early if we haven't any locked data (e.g., when first creating / joining a game)
          */
         ServerPlayerEvents.JOIN.register(player -> {
-            if(!PlayerState.get().getEnabled(player)) return;
-            WorldsData worldsData = PlayerState.get().getWorldsData(player);
+            if(!WTLComponents.playerState(player).isEnabled()) return;
             RegistryKey<World> worldKey = player.getEntityWorld().getRegistryKey();
-            LockedAxisData lockedAxisData = worldsData.worldData().get(worldKey);
+            LockedAxisData lockedAxisData = WTLComponents.lockedAxis(player.getEntityWorld()).getLockedAxisData(player.getUuid());
 
             if(lockedAxisData == null) return;
-            syncToClient(player,worldKey,lockedAxisData,worldsData.enabled());
+            syncToClient(player,worldKey,lockedAxisData);
         });
     }
 
@@ -174,8 +172,7 @@ public class AxisLockManager {
      * @param worldKey The registry key for the world (dimension)
      * @return The locked axis and coordinate for that world
      */
-    public static LockedAxisData determineDimensionLocks(ServerPlayerEntity player, RegistryKey<World> worldKey) {
-        PlayerState state = PlayerState.get();
+    public static LockedAxisData determineDimensionLocks(ServerPlayerEntity player, RegistryKey<World> worldKey, boolean isPrimary) {
         MinecraftServer server = player.getEntityWorld().getServer();
         String saveName = server.getSaveProperties().getLevelName();
         Axis axis;
@@ -194,22 +191,20 @@ public class AxisLockManager {
 
                 // Check if a primary axis exists for this save
                 // If it does, use the opposite axis for this player
-                if (state.hasPrimaryAxis(saveName)) {
-                    Axis primaryAxis = state.getPrimaryAxis(saveName);
-                    axis = (primaryAxis == Axis.X) ? Axis.Z : Axis.X;
+                if (isPrimary) {
+                    axis = Axis.Z;
                     coordinate = pos.toCenterPos().getComponentAlongAxis(axis) + player.getRandom().nextBetween(-400, 400);
                 } else {
                     axis = Axis.X;
                     coordinate = pos.toCenterPos().getComponentAlongAxis(axis);
-                    state.setPrimaryAxis(saveName, axis);
                 }
 
-                WalkTheLine.LOGGER.info("Update {}'s axis: {} / coord: {} (now primary: {})", player.getStringifiedName(), axis.asString(), coordinate, PlayerState.get().getPrimaryAxis(saveName));
+                WalkTheLine.LOGGER.info("Update {}'s axis: {} / coord: {}", player.getStringifiedName(), axis.asString(), coordinate);
             }
             case "the_nether" -> {
                 ServerWorld nether = player.getEntityWorld().getServer().getWorld(World.NETHER);
                 if(nether == null) return null;
-                LockedAxisData data = state.getLockedAxisData(player,saveName, World.OVERWORLD);
+                LockedAxisData data = WTLComponents.lockedAxis(server.getOverworld()).getLockedAxisData(player.getUuid());
                 if(data == null) return null;
                 axis = data.axis();
                 coordinate = Math.floor(player.getEntityPos().getComponentAlongAxis(axis)) + 0.5d;
@@ -218,17 +213,10 @@ public class AxisLockManager {
             default -> {
                 axis = Axis.Z;
                 coordinate = 0.5d;
-
-                // Check if a primary axis exists for this save
-                // If it does, use the opposite axis for this player
-                if (state.hasPrimaryAxis(saveName)) {
-                    Axis primaryAxis = state.getPrimaryAxis(saveName);
-                    axis = (primaryAxis == Axis.X) ? Axis.Z : Axis.X;
-                }
             }
         }
-        LockedAxisData data = new LockedAxisData(axis, coordinate, Formatting.RED);
-        syncToClient(player,worldKey,data,PlayerState.get().getEnabled(player));
+        LockedAxisData data = new LockedAxisData(WTLComponents.playerState(player).isEnabled(), axis, coordinate, Formatting.RED);
+        syncToClient(player,worldKey,data);
         return data;
     }
 
@@ -239,13 +227,12 @@ public class AxisLockManager {
      * @param player The server entity representing the player
      * @param worldKey The registry key for the world (dimension)
      * @param data The locked axis and coordinate data
-     * @param enabled Boolean determine if the mod is enabled
      */
-    public static void syncToClient(ServerPlayerEntity player, RegistryKey<World> worldKey, LockedAxisData data, Boolean enabled) {
+    public static void syncToClient(ServerPlayerEntity player, RegistryKey<World> worldKey, LockedAxisData data) {
         WalkTheLineConfig cfg = ConfigManager.getConfig();
 
         // create a packet
-        SyncPacket packet = new SyncPacket(player.getUuid(), worldKey,data, cfg.coordinateTolerance, enabled);
+        SyncPacket packet = new SyncPacket(player.getUuid(), worldKey,data, cfg.coordinateTolerance);
 
         // broadcast to all
         player.getEntityWorld().getServer().getPlayerManager().getPlayerList().forEach(p -> {

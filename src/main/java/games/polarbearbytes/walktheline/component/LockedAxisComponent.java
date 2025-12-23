@@ -36,6 +36,11 @@ public class LockedAxisComponent implements Component, AutoSyncedComponent {
         return axisMap.get(playerUuid);
     }
 
+    public void removeLocketAxisData(UUID playerUuid) {
+        axisMap.remove(playerUuid);
+        WTLComponents.LOCKED_AXIS.sync(world);
+    }
+
     public void setLockedAxisData(UUID playerUuid, LockedAxisData data) {
         axisMap.put(playerUuid, data);
         WTLComponents.LOCKED_AXIS.sync(world);

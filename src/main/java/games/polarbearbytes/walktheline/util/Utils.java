@@ -1,10 +1,10 @@
 package games.polarbearbytes.walktheline.util;
 
+import games.polarbearbytes.walktheline.component.WTLComponents;
 import games.polarbearbytes.walktheline.config.ConfigManager;
 import games.polarbearbytes.walktheline.config.WalkTheLineConfig;
 import games.polarbearbytes.walktheline.movement.AxisLockManager;
 import games.polarbearbytes.walktheline.state.LockedAxisData;
-import games.polarbearbytes.walktheline.state.PlayerState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Direction;
@@ -29,7 +29,7 @@ public class Utils {
     }
 
     public static void adjustmentPlayerPosition(ServerPlayerEntity player) {
-        LockedAxisData data = PlayerState.get().getLockedAxisData(player);
+        LockedAxisData data = WTLComponents.lockedAxis(player.getEntityWorld()).getLockedAxisData(player.getUuid());
         if (data == null) return;
 
         boolean result = AxisLockManager.checkDistanceFromLockedAxis(player, data);

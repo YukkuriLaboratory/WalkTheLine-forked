@@ -3,6 +3,7 @@ package games.polarbearbytes.walktheline.component;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.world.World;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 
@@ -25,7 +26,7 @@ public class PlayerStateComponent implements Component, AutoSyncedComponent {
     }
 
     public boolean isEnabled() {
-        return this.enabled;
+        return this.enabled && player.getEntityWorld().getRegistryKey() != World.END; // I know this is so bad. Sorry, I have no time to get better.
     }
 
     public void setEnabled(boolean enabled) {
