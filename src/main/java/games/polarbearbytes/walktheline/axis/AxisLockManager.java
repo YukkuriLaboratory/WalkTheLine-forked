@@ -44,7 +44,7 @@ public class AxisLockManager {
         along with wither or not the mod is enabled
          */
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, from, to) -> {
-            if(!WTLComponents.playerState(player).isEnabled()) return; // return if non-enabled player
+            if(!WTLComponents.playerState(player).isEnabledWithWorld()) return; // return if non-enabled player
             var axisData = WTLComponents.lockedAxis(to);
             if(axisData.getCrossPoint() == null) {
                 determineDimensionLocks(player, player.getEntityWorld().getRegistryKey(), WTLComponents.lockedAxis(from).getLockedAxisData(player.getUuid()).axis() == Axis.X);
@@ -73,7 +73,7 @@ public class AxisLockManager {
         we return early if we haven't any locked data (e.g., when first creating / joining a game)
          */
         ServerPlayerEvents.JOIN.register(player -> {
-            if(!WTLComponents.playerState(player).isEnabled()) return;
+            if(!WTLComponents.playerState(player).isEnabledWithWorld()) return;
             RegistryKey<World> worldKey = player.getEntityWorld().getRegistryKey();
             LockedAxisData lockedAxisData = WTLComponents.lockedAxis(player.getEntityWorld()).getLockedAxisData(player.getUuid());
 
@@ -210,7 +210,7 @@ public class AxisLockManager {
                 coordinate = 0.5d;
             }
         }
-        return new LockedAxisData(WTLComponents.playerState(player).isEnabled(), axis, coordinate, Formatting.RED);
+        return new LockedAxisData(WTLComponents.playerState(player).isEnabledWithWorld(), axis, coordinate, Formatting.RED);
     }
 
     public static double getPlayerCoordAlongLockedAxis(PlayerEntity player, Axis axis) {

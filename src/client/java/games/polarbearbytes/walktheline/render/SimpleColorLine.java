@@ -1,5 +1,6 @@
 package games.polarbearbytes.walktheline.render;
 
+import com.mojang.logging.LogUtils;
 import games.polarbearbytes.walktheline.WalkTheLine;
 import games.polarbearbytes.walktheline.axis.LockedAxisData;
 import games.polarbearbytes.walktheline.component.WTLComponents;
@@ -41,6 +42,7 @@ public class SimpleColorLine extends LineBase {
         var lockedAxis = WTLComponents.lockedAxis(client.world);
         var viewDistance = client.options.getViewDistance().getValue();
         client.world.getPlayers().forEach(p -> {
+            LogUtils.getLogger().debug("Rendered for {}", p.getStringifiedName());
             renderRainbowLine(cameraPos, entity, lockedAxis.getLockedAxisData(p.getUuid()), viewDistance);
         });
     }
@@ -81,7 +83,9 @@ public class SimpleColorLine extends LineBase {
 
         Integer lineColor = axisData.color().getColorValue();
         if(lineColor == null) lineColor = 0;
+        lineColor = 0xFF000000 | lineColor;
 
+        LogUtils.getLogger().debug("LineColor: {}", lineColor);
         buildFace(leftStart, leftEnd, lineBuilder, cameraPos, config, entity.getEntityWorld(), lineColor);
         buildFace(rightStart, rightEnd, lineBuilder, cameraPos, config, entity.getEntityWorld(), lineColor);
 

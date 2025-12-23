@@ -14,7 +14,7 @@ public class ClientMovementMixin {
     @Inject(method = "move", at = @At("RETURN"))
     private void restrictMovement(CallbackInfo ci) {
         Entity self = (Entity) (Object) this;
-        if(!(self instanceof PlayerEntity player) || !self.getEntityWorld().isClient() || !WTLComponents.playerState(player).isEnabled()) return;
+        if(!(self instanceof PlayerEntity player) || !self.getEntityWorld().isClient() || !WTLComponents.playerState(player).isEnabledWithWorld()) return;
 
         var data = WTLComponents.lockedAxisData(player);
         if(data == null) return;

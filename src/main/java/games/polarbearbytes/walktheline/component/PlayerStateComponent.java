@@ -29,6 +29,10 @@ public class PlayerStateComponent implements Component, AutoSyncedComponent {
     }
 
     public boolean isEnabled() {
+        return this.enabled;
+    }
+
+    public boolean isEnabledWithWorld() {
         return this.enabled && player.getEntityWorld().getRegistryKey() != World.END; // I know this is so bad. Sorry, I have no time to get better.
     }
 

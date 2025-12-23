@@ -15,7 +15,7 @@ public abstract class ServerMovementMixin {
     @Inject(method = "tickMovement", at = @At("HEAD"))
     private void restrictMovement(CallbackInfo ci) {
         Entity self = (Entity) (Object) this;
-        if (self instanceof ServerPlayerEntity player && WTLComponents.playerState(player).isEnabled()) {
+        if (self instanceof ServerPlayerEntity player && WTLComponents.playerState(player).isEnabledWithWorld()) {
             PlayerPosAdjust.apply(player);
         }
     }

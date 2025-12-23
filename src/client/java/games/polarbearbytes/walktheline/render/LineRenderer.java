@@ -1,6 +1,7 @@
 package games.polarbearbytes.walktheline.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.logging.LogUtils;
 import games.polarbearbytes.walktheline.component.WTLComponents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
@@ -36,7 +37,10 @@ public class LineRenderer implements IRenderer {
     public void render(Framebuffer framebuffer, Matrix4f positionMatrix, Matrix4f projectionMatrix, MinecraftClient client, FrameGraphBuilder frameGraphBuilder, DefaultFramebufferSet fbSet, Frustum frustum, Camera camera, BufferBuilderStorage buffers, Profiler profiler){
         Entity cameraEntity = client.getCameraEntity();
         if(cameraEntity instanceof PlayerEntity player) {
-            if(!WTLComponents.playerState(player).isEnabled()) return;
+            if(!WTLComponents.playerState(player).isEnabled()) {
+                LogUtils.getLogger().debug("Ignored rendering for {}", player.getStringifiedName());
+                return;
+            }
         }
         this.update(camera.getCameraPos(), cameraEntity, client);
         this.draw(camera.getCameraPos());
