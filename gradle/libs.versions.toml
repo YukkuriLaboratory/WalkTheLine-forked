@@ -12,6 +12,7 @@ clothConfig = "21.11.150"
 fabricPermissionsApi = "0.6.1"
 iris = "1.10.2+1.21.11-fabric"
 modmenu = "17.0.0-alpha.1"
+cca = "7.3.0"
 
 [libraries]
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
@@ -26,8 +27,16 @@ clothConfig = { module = "me.shedaniel.cloth:cloth-config-fabric", version.ref =
 fabricPermissionsApi = { module = "me.lucko:fabric-permissions-api", version.ref = "fabricPermissionsApi" }
 iris = { module = "maven.modrinth:iris", version.ref = "iris" }
 modmenu = { module = "com.terraformersmc:modmenu", version.ref = "modmenu" }
+cca-base = { module = "org.ladysnake.cardinal-components-api:cardinal-components-base", version.ref = "cca"}
+cca-world = { module = "org.ladysnake.cardinal-components-api:cardinal-components-world", version.ref = "cca"}
+cca-entity = { module = "org.ladysnake.cardinal-components-api:cardinal-components-entity", version.ref = "cca"}
 
 [bundles]
+cca = [
+    "cca-base",
+    "cca-world",
+    "cca-entity"
+]
 
 [plugins]
 fabricLoom = { id = "fabric-loom", version.ref = "fabricLoom" }

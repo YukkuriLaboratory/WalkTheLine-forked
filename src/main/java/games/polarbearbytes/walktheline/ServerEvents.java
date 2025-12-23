@@ -1,16 +1,21 @@
 package games.polarbearbytes.walktheline;
 
+import games.polarbearbytes.walktheline.component.WTLComponents;
 import games.polarbearbytes.walktheline.movement.AxisLockManager;
 import games.polarbearbytes.walktheline.network.SyncPacket;
-import games.polarbearbytes.walktheline.state.PlayerState;
 import games.polarbearbytes.walktheline.util.PosUtil;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.minecraft.command.argument.ColorArgumentType;
+import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 
+import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 /**
@@ -45,15 +50,16 @@ public class ServerEvents {
                                                 return 0;
                                             }
                                             var server = ctx.getSource().getServer();
-                                            var playerState = PlayerState.get();
-                                            playerState.setEnabled(player, true, false);
-                                            var data = playerState.getLockedAxisData(player); // might be null
+                                            var playerState = WTLComponents.playerState(player);
+                                            playerState.setEnabled(true); // Todo: don't forget to apply false adjustment
+//                                            playerState.setEnabled(player, true, false);
+                                            var data = WTLComponents.lockedAxis(ctx.getSource().getWorld()).getLockedAxisData(player.getUuid());
                                             server.getPlayerManager()
                                                     .getPlayerList()
                                                     .stream()
-                                                    .filter((p) -> p != player && !PlayerState.get().getEnabled(p))
+                                                    .filter((p) -> p != player && !WTLComponents.playerState(p).isEnabled())
                                                     .forEach((otherPlayer) -> {
-                                                        PlayerState.get().setEnabled(otherPlayer, true, false);
+                                                        WTLComponents.playerState(otherPlayer).setEnabled(true);
                                                     });
 
                                             // get other player's data
@@ -62,7 +68,7 @@ public class ServerEvents {
                                                 WalkTheLine.LOGGER.warn("Other player wasn't found!");
                                                 return 0;
                                             }
-                                            var otherData = PlayerState.get().getLockedAxisData(optionalOtherPlayer.get());
+                                            var otherData = WTLComponents.lockedAxis(ctx.getSource().getWorld()).getLockedAxisData(optionalOtherPlayer.get().getUuid());
 
                                             // get safe y of cross point
                                             var crossX = data.coordinate();
@@ -84,10 +90,27 @@ public class ServerEvents {
                                 )
                                 .then(literal("disable")
                                         .executes(ctx -> {
-                                            PlayerState.get().setEnabled(ctx.getSource().getPlayer(), false);
+                                            WTLComponents.playerState(ctx.getSource().getPlayer()).setEnabled(false);
                                             ctx.getSource().sendFeedback(() -> Text.literal("Walk the Line disabled."), false);
                                             return 1;
                                         })
+                                )
+                                .then(literal("setcolor")
+                                        .then(argument("target", EntityArgumentType.player()).then(argument("color", ColorArgumentType.color())
+                                        .executes(ctx -> {
+                                            Formatting color = ColorArgumentType.getColor(ctx, "color");
+                                            ServerPlayerEntity player = ctx.getSource().getPlayer();
+                                            if(player == null) {
+                                                ctx.getSource().sendFeedback(() -> Text.literal("Server Console wasn't supported."), false);
+                                                return 1;
+                                            }
+
+                                            var playerUuid = ctx.getSource().getPlayer().getUuid();
+                                            var lockedAxis = WTLComponents.lockedAxis(ctx.getSource().getWorld());
+                                            var data = lockedAxis.getLockedAxisData(playerUuid);
+                                            ctx.getSource().sendFeedback(() -> Text.translatable("walktheline.cmd.walktheline.setcolor.changed"), false);
+                                            return 1;
+                                        })))
                                 )
                 );
             }

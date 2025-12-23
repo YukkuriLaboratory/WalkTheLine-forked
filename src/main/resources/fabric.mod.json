@@ -26,7 +26,10 @@
 		],
 		"fabric-datagen": [
 
-		]
+		],
+        "cardinal-components": [
+            "games.polarbearbytes.walktheline.component.WTLComponents"
+        ]
 	},
 	"mixins": [
 		"walk-the-line.mixins.json",
@@ -35,6 +38,11 @@
 			"environment": "client"
 		}
 	],
+    "custom": {
+        "cardinal-components": [
+            "walk-the-line:locked_axis"
+        ]
+    },
 	"depends": {
 		"fabricloader": ">=0.16.14",
 		"cloth-config": "*",

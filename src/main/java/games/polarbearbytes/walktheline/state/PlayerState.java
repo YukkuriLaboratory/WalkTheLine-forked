@@ -27,7 +27,7 @@ import static games.polarbearbytes.walktheline.movement.AxisLockManager.syncToCl
 /**
  * Player state class for saving the locked axis, coordinate data per world (dimension), per save, per player
  */
-public class PlayerState extends PersistentState {
+public class PlayerStatea extends PersistentState {
     public static final Codec<PlayerState> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.unboundedMap(
                     Uuids.CODEC,

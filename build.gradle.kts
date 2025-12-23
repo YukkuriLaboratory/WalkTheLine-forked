@@ -30,6 +30,16 @@ repositories {
             includeGroup("maven.modrinth")
         }
     }
+    exclusiveContent {
+        forRepository {
+            maven("https://maven.ladysnake.org/releases") {
+                name = "Ladysnake Mods"
+            }
+        }
+        filter {
+            includeGroup("org.ladysnake.cardinal-components-api")
+        }
+    }
 }
 
 loom {
@@ -53,6 +63,7 @@ dependencies {
     modImplementation(libs.joml)?.let(::include)
 
     modImplementation(libs.fabricPermissionsApi)?.let(::include)
+    modImplementation(libs.bundles.cca)?.let(::include)
     modCompileOnly(libs.iris)
 
     minecraft(libs.minecraft)

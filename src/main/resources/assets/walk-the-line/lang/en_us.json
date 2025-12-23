@@ -8,5 +8,7 @@
   "text.autoconfig.walk-the-line-client.option.rotatingColor.@Tooltip": "Line will appear with rotating colors",
   "text.autoconfig.walk-the-line-client.option.rotatingColorAlpha.@Tooltip": "Transparency of rotating colors as %",
   "text.autoconfig.walk-the-line-client.option.lineWidth.@Tooltip": "Size of the line on left and right side of player",
-  "text.autoconfig.walk-the-line-client.option.singleColor.@Tooltip": "RGBA Hex Code"
+  "text.autoconfig.walk-the-line-client.option.singleColor.@Tooltip": "RGBA Hex Code",
+
+  "walktheline.cmd.walktheline.setcolor.changed": "%s's line color was changed to %s."
 }
