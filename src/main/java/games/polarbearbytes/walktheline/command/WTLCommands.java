@@ -78,7 +78,7 @@ public class WTLCommands {
                     .then(argument("target", EntityArgumentType.player()).then(argument("color", ColorArgumentType.color())
                             .executes(ctx -> {
                                 Formatting color = ColorArgumentType.getColor(ctx, "color");
-                                ServerPlayerEntity player = ctx.getSource().getPlayer();
+                                ServerPlayerEntity player = EntityArgumentType.getPlayer(ctx, "target");
                                 if(player == null) {
                                     ctx.getSource().sendFeedback(() -> Text.literal("Server Console wasn't supported."), false);
                                     return 1;

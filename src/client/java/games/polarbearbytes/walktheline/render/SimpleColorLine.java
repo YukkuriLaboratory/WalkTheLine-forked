@@ -25,10 +25,11 @@ import net.minecraft.world.World;
  * @since 2025-07-24
  */
 public class SimpleColorLine extends LineBase {
-    public final static SimpleColorLine INSTANCE = new SimpleColorLine();
+    private final PlayerEntity player;
 
-    protected SimpleColorLine(){
+    protected SimpleColorLine(PlayerEntity player){
         this.lineThickness = 8;
+        this.player = player;
     }
 
     @Override
@@ -41,10 +42,7 @@ public class SimpleColorLine extends LineBase {
         if(client.world == null) return;
         var lockedAxis = WTLComponents.lockedAxis(client.world);
         var viewDistance = client.options.getViewDistance().getValue();
-        client.world.getPlayers().forEach(p -> {
-            LogUtils.getLogger().debug("Rendered for {}", p.getStringifiedName());
-            renderRainbowLine(cameraPos, p, lockedAxis.getLockedAxisData(p.getUuid()), viewDistance);
-        });
+        renderRainbowLine(cameraPos, player, lockedAxis.getLockedAxisData(player.getUuid()), viewDistance);
     }
 
     public void renderRainbowLine(Vec3d cameraPos, Entity entity, LockedAxisData axisData, int viewDistance) {
