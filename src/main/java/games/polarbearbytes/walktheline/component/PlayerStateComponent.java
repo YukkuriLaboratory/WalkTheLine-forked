@@ -10,6 +10,7 @@ import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 public class PlayerStateComponent implements Component, AutoSyncedComponent {
     private final PlayerEntity player;
     private boolean enabled = false;
+    private double coordTolerance = 0.5;
 
     public PlayerStateComponent(PlayerEntity player) {
         this.player = player;
@@ -18,11 +19,13 @@ public class PlayerStateComponent implements Component, AutoSyncedComponent {
     @Override
     public void readData(ReadView readView) {
         enabled = readView.getBoolean("enabled", false);
+        coordTolerance = readView.getDouble("coord_to_lerance", 0.5);
     }
 
     @Override
     public void writeData(WriteView writeView) {
         writeView.putBoolean("enabled", enabled);
+        writeView.putDouble("coord_to_lerance", coordTolerance);
     }
 
     public boolean isEnabled() {
@@ -31,6 +34,15 @@ public class PlayerStateComponent implements Component, AutoSyncedComponent {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+        WTLComponents.PLAYER_STATE.sync(player);
+    }
+
+    public double getCoordTolerance() {
+        return this.coordTolerance;
+    }
+
+    public void setCoordTolerance(double coordTolerance) {
+        this.coordTolerance = coordTolerance;
         WTLComponents.PLAYER_STATE.sync(player);
     }
 }
