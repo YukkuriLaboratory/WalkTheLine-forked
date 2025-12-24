@@ -48,7 +48,7 @@ public class SimpleColorLine extends LineBase {
 
     public void renderRainbowLine(Vec3d cameraPos, Entity entity, LockedAxisData axisData, int viewDistance) {
         if(lastEntityPosition == null || axisData == null ) return;
-        LogUtils.getLogger().info("Rendering for {}", player.getStringifiedName());
+        LogUtils.getLogger().info("Rendering for {} (Axis: {}, Coord: {})", player.getStringifiedName(), axisData.axis(), axisData.coordinate());
         var playerState = WTLComponents.playerState(player);
         double tolerance = playerState.getCoordTolerance();
 
