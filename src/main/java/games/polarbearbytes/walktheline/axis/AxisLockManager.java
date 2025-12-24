@@ -45,8 +45,9 @@ public class AxisLockManager {
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, from, to) -> {
             if(!WTLComponents.playerState(player).isEnabledWithWorld()) return; // return if non-enabled player
             var axisData = WTLComponents.lockedAxis(to);
-            if(axisData.getCrossPoint() == null) {
-                determineDimensionLocks(player, player.getEntityWorld().getRegistryKey(), WTLComponents.lockedAxis(from).getLockedAxisData(player.getUuid()).axis() == Axis.X);
+            if(axisData.getLockedAxisData(player.getUuid()) == null) {
+                var data = determineDimensionLocks(player, player.getEntityWorld().getRegistryKey(), WTLComponents.lockedAxis(from).getLockedAxisData(player.getUuid()).axis() == Axis.X);
+                axisData.setLockedAxisData(player.getUuid(), data);
             }
             boolean isInEnd = StrongholdLocator.WorldUtil.isTheEnd(to);
             if(isInEnd) {
@@ -196,11 +197,11 @@ public class AxisLockManager {
                 WalkTheLine.LOGGER.info("Update {}'s axis: {} / coord: {}", player.getStringifiedName(), axis.asString(), coordinate);
             }
             case "the_nether" -> {
-                ServerWorld nether = player.getEntityWorld().getServer().getWorld(World.NETHER);
-                if(nether == null) return null;
-                var lockedAxis = WTLComponents.lockedAxis(nether);
+                ServerWorld overworld = player.getEntityWorld().getServer().getWorld(World.OVERWORLD);
+                if(overworld == null) return null;
+                var lockedAxis = WTLComponents.lockedAxis(overworld);
                 var data = lockedAxis.getLockedAxisData(player.getUuid());
-                axis = data.axis();
+                axis = data == null ? Axis.X : data.axis();
                 coordinate = Math.floor(player.getEntityPos().getComponentAlongAxis(axis)) + 0.5d;
             }
             //the end dimension
