@@ -68,4 +68,8 @@ public class LineRenderer implements IRenderer {
             renderer.reset();
         }
     }
+
+    public void clearRenderers() {
+        playerLineRenderers.clear();
+    }
 }

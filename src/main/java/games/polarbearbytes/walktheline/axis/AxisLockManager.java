@@ -14,7 +14,6 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
@@ -210,7 +209,7 @@ public class AxisLockManager {
                 coordinate = 0.5d;
             }
         }
-        return new LockedAxisData(WTLComponents.playerState(player).isEnabledWithWorld(), axis, coordinate, Formatting.RED);
+        return new LockedAxisData(WTLComponents.playerState(player).isEnabledWithWorld(), axis, coordinate);
     }
 
     public static double getPlayerCoordAlongLockedAxis(PlayerEntity player, Axis axis) {

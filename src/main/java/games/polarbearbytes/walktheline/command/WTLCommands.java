@@ -84,12 +84,8 @@ public class WTLCommands {
                                     return 1;
                                 }
 
-                                var playerUuid = ctx.getSource().getPlayer().getUuid();
-                                var lockedAxis = WTLComponents.lockedAxis(ctx.getSource().getWorld());
-                                var data = lockedAxis.getLockedAxisData(playerUuid);
-                                if(data == null) return 1;
-                                data.setColor(color);
-                                lockedAxis.setLockedAxisData(playerUuid, data);
+                                var playerState = WTLComponents.playerState(player);
+                                playerState.setLineColor(color);
                                 ctx.getSource().sendFeedback(() -> Text.translatable("walktheline.cmd.walktheline.setcolor.changed", ctx.getSource().getPlayer().getStringifiedName(), color.getName()), false);
                                 return 1;
                             })))

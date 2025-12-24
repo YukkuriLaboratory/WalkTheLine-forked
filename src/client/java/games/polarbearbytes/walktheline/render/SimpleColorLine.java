@@ -47,7 +47,13 @@ public class SimpleColorLine extends LineBase {
 
     public void renderRainbowLine(Vec3d cameraPos, Entity entity, LockedAxisData axisData, int viewDistance) {
         if(lastEntityPosition == null || axisData == null || !(entity instanceof PlayerEntity player)) return;
-        double tolerance = WTLComponents.playerState(player).getCoordTolerance();
+        var playerState = WTLComponents.playerState(player);
+        double tolerance = playerState.getCoordTolerance();
+
+        Integer lineColor = playerState.getLineColor().getColorValue();
+        if(lineColor == null) lineColor = 0;
+        lineColor = 0xFF000000 | lineColor;
+
 
         BufferBuilder lineBuilder = this.renderContext.init();
 
@@ -78,10 +84,6 @@ public class SimpleColorLine extends LineBase {
 
         Vec3d rightStart = lineStart.offset(perpendicularDirections[1],lineOffset);
         Vec3d rightEnd = lineEnd.offset(perpendicularDirections[1],-tolerance);
-
-        Integer lineColor = axisData.color().getColorValue();
-        if(lineColor == null) lineColor = 0;
-        lineColor = 0xFF000000 | lineColor;
 
         LogUtils.getLogger().debug("LineColor: {}", lineColor);
         buildFace(leftStart, leftEnd, lineBuilder, cameraPos, config, entity.getEntityWorld(), lineColor);
