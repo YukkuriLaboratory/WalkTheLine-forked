@@ -32,6 +32,17 @@ public class SimpleColorLine extends LineBase {
         this.player = player;
     }
 
+    private Vec3d getPlayerPos() {
+        var world = MinecraftClient.getInstance().world;
+        if(world != null) {
+            var clientPlayer = world.getPlayerByUuid(player.getUuid());
+            if(clientPlayer != null) {
+                return clientPlayer.getEntityPos();
+            }
+        }
+        return player.getEntityPos();
+    }
+
     @Override
     public boolean shouldUpdate(Entity entity, MinecraftClient client) {
         return true;
@@ -40,7 +51,7 @@ public class SimpleColorLine extends LineBase {
     @Override
     public void render(Vec3d cameraPos, Entity entity, MinecraftClient client) {
         if(client.world == null) return;
-        lastEntityPosition = BlockPos.ofFloored(player.getEntityPos());
+        lastEntityPosition = BlockPos.ofFloored(getPlayerPos());
         var lockedAxis = WTLComponents.lockedAxis(client.world);
         var viewDistance = client.options.getViewDistance().getValue();
         renderRainbowLine(cameraPos, player, lockedAxis.getLockedAxisData(player.getUuid()), viewDistance);
@@ -68,8 +79,8 @@ public class SimpleColorLine extends LineBase {
         //This is the left to right directions that we are clamped on
         Direction[] perpendicularDirections = axisData.axis().getDirections();
 
-        Vec3d lineStart = player.getEntityPos().offset(directions[0], 16* viewDistance);
-        Vec3d lineEnd = player.getEntityPos().offset(directions[1], 16* viewDistance);
+        Vec3d lineStart = getPlayerPos().offset(directions[0], 16* viewDistance);
+        Vec3d lineEnd = getPlayerPos().offset(directions[1], 16* viewDistance);
 
         if(axisData.axis() == Axis.Z){
             lineStart = new Vec3d(lineStart.getX(), lineStart.getY(), axisData.coordinate());
