@@ -40,13 +40,15 @@ public class SimpleColorLine extends LineBase {
     @Override
     public void render(Vec3d cameraPos, Entity entity, MinecraftClient client) {
         if(client.world == null) return;
+        lastEntityPosition = BlockPos.ofFloored(player.getEntityPos());
         var lockedAxis = WTLComponents.lockedAxis(client.world);
         var viewDistance = client.options.getViewDistance().getValue();
         renderRainbowLine(cameraPos, player, lockedAxis.getLockedAxisData(player.getUuid()), viewDistance);
     }
 
     public void renderRainbowLine(Vec3d cameraPos, Entity entity, LockedAxisData axisData, int viewDistance) {
-        if(lastEntityPosition == null || axisData == null || !(entity instanceof PlayerEntity player)) return;
+        if(lastEntityPosition == null || axisData == null ) return;
+        LogUtils.getLogger().info("Rendering for {}", player.getStringifiedName());
         var playerState = WTLComponents.playerState(player);
         double tolerance = playerState.getCoordTolerance();
 
@@ -66,8 +68,8 @@ public class SimpleColorLine extends LineBase {
         //This is the left to right directions that we are clamped on
         Direction[] perpendicularDirections = axisData.axis().getDirections();
 
-        Vec3d lineStart = entity.getEntityPos().offset(directions[0], 16* viewDistance);
-        Vec3d lineEnd = entity.getEntityPos().offset(directions[1], 16* viewDistance);
+        Vec3d lineStart = player.getEntityPos().offset(directions[0], 16* viewDistance);
+        Vec3d lineEnd = player.getEntityPos().offset(directions[1], 16* viewDistance);
 
         if(axisData.axis() == Axis.Z){
             lineStart = new Vec3d(lineStart.getX(), lineStart.getY(), axisData.coordinate());
@@ -86,8 +88,8 @@ public class SimpleColorLine extends LineBase {
         Vec3d rightEnd = lineEnd.offset(perpendicularDirections[1],-tolerance);
 
         LogUtils.getLogger().debug("LineColor: {}", lineColor);
-        buildFace(leftStart, leftEnd, lineBuilder, cameraPos, config, entity.getEntityWorld(), lineColor);
-        buildFace(rightStart, rightEnd, lineBuilder, cameraPos, config, entity.getEntityWorld(), lineColor);
+        buildFace(leftStart, leftEnd, lineBuilder, cameraPos, config, player.getEntityWorld(), lineColor);
+        buildFace(rightStart, rightEnd, lineBuilder, cameraPos, config, player.getEntityWorld(), lineColor);
 
         try {
             BuiltBuffer lineMeshData = lineBuilder.endNullable();

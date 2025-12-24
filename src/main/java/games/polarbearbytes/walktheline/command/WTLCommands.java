@@ -86,7 +86,7 @@ public class WTLCommands {
 
                                 var playerState = WTLComponents.playerState(player);
                                 playerState.setLineColor(color);
-                                ctx.getSource().sendFeedback(() -> Text.translatable("walktheline.cmd.walktheline.setcolor.changed", ctx.getSource().getPlayer().getStringifiedName(), color.getName()), false);
+                                ctx.getSource().sendFeedback(() -> Text.translatable("walktheline.cmd.walktheline.setcolor.changed", player.getStringifiedName(), color.getName()), false);
                                 return 1;
                             })))
             );

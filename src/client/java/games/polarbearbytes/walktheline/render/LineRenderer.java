@@ -3,14 +3,12 @@ package games.polarbearbytes.walktheline.render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.DefaultFramebufferSet;
 import net.minecraft.client.render.FrameGraphBuilder;
 import net.minecraft.client.render.Frustum;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.profiler.Profiler;
 import org.joml.Matrix4f;
@@ -38,14 +36,14 @@ public class LineRenderer implements IRenderer {
     }
 
     public void update(Vec3d cameraPos, Entity entity, MinecraftClient client){
-        for (AbstractClientPlayerEntity player : client.world.getPlayers()) {
-            if(!playerLineRenderers.containsKey(player.getUuid())) {
-                playerLineRenderers.put(player.getUuid(), new SimpleColorLine(player));
+        MinecraftClient.getInstance().player.getEntityWorld().getPlayers().forEach(p -> {
+            var uuid = p.getUuid();
+            if(!playerLineRenderers.containsKey(uuid)) {
+                playerLineRenderers.put(uuid, new SimpleColorLine(p));
             }
-        }
+
+        });
         for(LineBase renderer : this.playerLineRenderers.values()){
-            if(!renderer.shouldUpdate(entity, client)) return;
-            renderer.lastEntityPosition = BlockPos.ofFloored(entity.getEntityPos());
             renderer.update(cameraPos, entity, client);
             renderer.setLastCameraPosition(cameraPos);
         }

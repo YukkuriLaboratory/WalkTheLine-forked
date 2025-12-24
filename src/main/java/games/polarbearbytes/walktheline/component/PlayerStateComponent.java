@@ -10,7 +10,7 @@ import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 
 public class PlayerStateComponent implements Component, AutoSyncedComponent {
     private final PlayerEntity player;
-    private Formatting lineColor;
+    private Formatting lineColor = Formatting.RED;
     private boolean enabled = false;
     private double coordTolerance = 0.5;
 
