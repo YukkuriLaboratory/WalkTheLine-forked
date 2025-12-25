@@ -77,7 +77,7 @@ public class AxisLockManager {
             RegistryKey<World> worldKey = player.getEntityWorld().getRegistryKey();
             LockedAxisData lockedAxisData = WTLComponents.lockedAxis(player.getEntityWorld()).getLockedAxisData(player.getUuid());
 
-            if(lockedAxisData == null) return;
+            WTLComponents.playerState(player).setCoordTolerance(ConfigManager.getConfig().coordinateTolerance);
         });
     }
 
