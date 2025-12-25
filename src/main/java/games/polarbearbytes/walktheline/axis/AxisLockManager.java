@@ -187,7 +187,7 @@ public class AxisLockManager {
                     Pair<BlockPos, Direction> locationPair = StrongholdLocator.getClosestStrongHoldPortalroom(spawnPosition);
                     if(locationPair == null || locationPair.getFirst() == null) return null;
                     BlockPos pos = locationPair.getFirst();
-                    crossPoint = new Vec3i(pos.getX(), 60, pos.getZ() + (player.getRandom().nextBetween(1200, 2000) * (player.getRandom().nextBoolean() ? 1: -1)));
+                    crossPoint = new Vec3i(pos.getX(), 60, pos.getZ() + (player.getRandom().nextBetween(500,600) * (player.getRandom().nextBoolean() ? 1: -1)));
                     lockedAxis.setCrossPoint(crossPoint);
                 }
 
