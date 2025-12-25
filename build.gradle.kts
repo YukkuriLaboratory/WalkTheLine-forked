@@ -111,7 +111,7 @@ tasks.jar {
 
 tasks.remapJar {
     dependsOn(tasks.jar)
-    archiveFileName.set("${project.base.archivesName}-${project.version}-${libs.versions.minecraft.get()}.jar")
+    archiveFileName.set("${project.name}-${project.version}.jar")
 }
 
 // configure the maven publication
