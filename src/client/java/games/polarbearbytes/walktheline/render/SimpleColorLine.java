@@ -61,7 +61,7 @@ public class SimpleColorLine extends LineBase {
         if(lastEntityPosition == null || axisData == null ) return;
         LogUtils.getLogger().debug("Rendering for {} (Axis: {}, Coord: {})", player.getStringifiedName(), axisData.axis(), axisData.coordinate());
         var playerState = WTLComponents.playerState(player);
-        double tolerance = playerState.getCoordTolerance();
+        double tolerance = 0.5;
 
         Integer lineColor = playerState.getLineColor().getColorValue();
         if(lineColor == null) lineColor = 0;
