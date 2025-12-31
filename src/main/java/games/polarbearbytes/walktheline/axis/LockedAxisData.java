@@ -2,6 +2,7 @@ package games.polarbearbytes.walktheline.axis;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Direction.Axis;
 
 import java.util.Objects;
@@ -52,6 +53,25 @@ public final class LockedAxisData {
 
     public double coordinate() {
         return coordinate;
+    }
+
+    /**
+     * Clamp an entity's position to stay within tolerance of the locked coordinate.
+     * Only modifies the position on the restricted axis.
+     *
+     * @param entity The entity to clamp
+     * @param tolerance The allowed distance from the locked coordinate
+     */
+    public void clampEntityPosition(Entity entity, double tolerance) {
+        double x = entity.getX();
+        double z = entity.getZ();
+
+        if (axis == Axis.X) {
+            x = Math.clamp(x, coordinate - tolerance, coordinate + tolerance);
+        } else {
+            z = Math.clamp(z, coordinate - tolerance, coordinate + tolerance);
+        }
+        entity.setPos(x, entity.getY(), z);
     }
 
     @Override

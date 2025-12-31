@@ -125,8 +125,14 @@ public class AxisLockManager {
             }
             return false;
         }
-        //Entity is outside the tolerated bounds so apply a small pushback to keep them within
-        applyPushback(entity,data.axis(),distance);
+        //Entity is outside the tolerated bounds
+        if (player.hasVehicle()) {
+            // For vehicles: clamp position only, minimal velocity interference
+            applyVehicleBoundaryClamping(entity, data, tolerance);
+        } else {
+            // For walking players: apply pushback as before
+            applyPushback(entity, data.axis(), distance);
+        }
         return true;
     }
 
@@ -152,6 +158,38 @@ public class AxisLockManager {
 
         player.setVelocity(newVelocity);
         player.knockedBack = true;
+    }
+
+    /**
+     * For vehicles: clamp position to boundary and zero only the perpendicular velocity component
+     * that is moving away from the boundary. This preserves momentum along the allowed axis.
+     *
+     * @param vehicle The vehicle entity to clamp
+     * @param data The locked axis data
+     * @param tolerance The allowed tolerance from the locked coordinate
+     */
+    private static void applyVehicleBoundaryClamping(Entity vehicle, LockedAxisData data, double tolerance) {
+        Axis axis = data.axis();
+        double lockedCoord = data.coordinate();
+        Vec3d velocity = vehicle.getVelocity();
+
+        // Get current position before clamping (for velocity adjustment)
+        double currentCoord = (axis == Axis.X) ? vehicle.getX() : vehicle.getZ();
+
+        // Use shared position clamping logic
+        data.clampEntityPosition(vehicle, tolerance);
+
+        // Zero velocity component only if moving away from the locked coordinate
+        if (axis == Axis.X) {
+            if ((currentCoord > lockedCoord && velocity.x > 0) || (currentCoord < lockedCoord && velocity.x < 0)) {
+                vehicle.setVelocity(0, velocity.y, velocity.z);
+            }
+        } else {
+            if ((currentCoord > lockedCoord && velocity.z > 0) || (currentCoord < lockedCoord && velocity.z < 0)) {
+                vehicle.setVelocity(velocity.x, velocity.y, 0);
+            }
+        }
+        // Do NOT set knockedBack for vehicles to avoid interference with boat physics
     }
 
     /**
