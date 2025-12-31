@@ -79,15 +79,13 @@ public class SimpleColorLine extends LineBase {
         //This is the left to right directions that we are clamped on
         Direction[] perpendicularDirections = axisData.axis().getDirections();
 
-        Vec3d lineStart = getPlayerPos().offset(directions[0], 16* viewDistance);
-        Vec3d lineEnd = getPlayerPos().offset(directions[1], 16* viewDistance);
+        Vec3d lineStart = getPlayerPos().offset(directions[0], 16* viewDistance).withAxis(axisData.axis(), axisData.coordinate());
+        Vec3d lineEnd = getPlayerPos().offset(directions[1], 16* viewDistance).withAxis(axisData.axis(), axisData.coordinate());
 
-        if(axisData.axis() == Axis.Z){
-            lineStart = new Vec3d(lineStart.getX(), lineStart.getY(), axisData.coordinate());
-            lineEnd = new Vec3d(lineEnd.getX(), lineEnd.getY(), axisData.coordinate());
-        } else {
-            lineStart = new Vec3d(axisData.coordinate(), lineStart.getY(), lineStart.getZ());
-            lineEnd = new Vec3d(axisData.coordinate(), lineEnd.getY(), lineEnd.getZ());
+        // If entity is riding, render coord Y plus 1
+        if(entity.hasVehicle()) {
+            lineStart = lineStart.add(0,0.8,0);
+            lineEnd = lineEnd.add(0,0.8,0);
         }
 
         float lineOffset = (float)-tolerance - lineWidth;
