@@ -17,6 +17,9 @@ public class PlayerPosAdjust {
         //result will be false if it had to move us.
         if (!result) return;
 
+        // For vehicles: AxisLockManager handles clamping, skip velocity reset here
+        if (player.hasVehicle()) return;
+
         WalkTheLineConfig cfg = ConfigManager.getConfig();
 
         double x = player.getX();

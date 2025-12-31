@@ -19,17 +19,12 @@ public class ClientMovementMixin {
         var data = WTLComponents.lockedAxisData(player);
         if(data == null) return;
 
-        double x = self.getX();
-        double z = self.getZ();
         double tolerance = WTLComponents.playerState(player).getCoordTolerance();
 
-        if(data.axis() == Direction.Axis.X){
-            if(x > data.coordinate() + tolerance) x = data.coordinate() + tolerance;
-            if(x < data.coordinate() - tolerance) x = data.coordinate() - tolerance;
-        } else {
-            if(z > data.coordinate() + tolerance) z = data.coordinate() + tolerance;
-            if(z < data.coordinate() - tolerance) z = data.coordinate() - tolerance;
+        // Use shared position clamping logic for both vehicles and walking players
+        Entity target = player.hasVehicle() ? player.getVehicle() : self;
+        if(target != null) {
+            data.clampEntityPosition(target, tolerance);
         }
-        self.setPos(x, self.getY(), z);
     }
 }
